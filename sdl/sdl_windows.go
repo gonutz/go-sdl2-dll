@@ -2319,10 +2319,8 @@ func GameControllerMappingForGUID(guid JoystickGUID) string {
 // GameControllerMappingForIndex returns the game controller mapping string at a
 // particular index.
 func GameControllerMappingForIndex(index int) string {
-	//mappingString := C.SDL_GameControllerMappingForIndex(C.int(index))
-	//defer C.free(unsafe.Pointer(mappingString))
-	//return C.GoString(mappingString)
-	return "" // TODO
+	ret, _, _ := gameControllerMappingForIndex.Call(uintptr(index))
+	return sdlToGoString(ret)
 }
 
 // GameControllerNameForIndex returns the implementation dependent name for the game controller.
@@ -2446,7 +2444,6 @@ func GetError() error {
 // GetEventState returns the current processing state of the specified event
 // (https://wiki.libsdl.org/SDL_EventState)
 func GetEventState(typ uint32) uint8 {
-	// TODO what about QUERY
 	ret, _, _ := eventState.Call(uintptr(typ), ^uintptr(0) /* == QUERY */)
 	return uint8(ret)
 }
@@ -2637,7 +2634,7 @@ func GetRGBA(pixel uint32, format *PixelFormat) (r, g, b, a uint8) {
 // (https://wiki.libsdl.org/SDL_GetRelativeMouseMode)
 func GetRelativeMouseMode() bool {
 	ret, _, _ := getRelativeMouseMode.Call()
-	return ret > 0 // TODO right? using uintptr here
+	return ret != 0
 }
 
 // GetRelativeMouseState returns the relative state of the mouse.
@@ -2654,16 +2651,19 @@ func GetRelativeMouseState() (x, y int32, state uint32) {
 // GetRenderDriverInfo returns information about a specific 2D rendering driver for the current display.
 // (https://wiki.libsdl.org/SDL_GetRenderDriverInfo)
 func GetRenderDriverInfo(index int, info *RendererInfo) (int, error) {
-	// TODO
-	//var cinfo cRendererInfo
-	//ret := int(C.SDL_GetRenderDriverInfo(C.int(index), cinfo.cptr()))
-	//if ret < 0 {
-	//	return ret, GetError()
-	//}
-	//info.RendererInfoData = cinfo.RendererInfoData
-	//// No need to free, it's done by DestroyRenderer
-	//info.Name = C.GoString(cinfo.Name)
-	//return ret, nil
+	var cInfo struct {
+		name uintptr
+		RendererInfoData
+	}
+	ret, _, _ := getRenderDriverInfo.Call(
+		uintptr(index),
+		uintptr(unsafe.Pointer(&cInfo)),
+	)
+	if ret != 0 {
+		return int(ret), GetError()
+	}
+	info.Name = sdlToGoString(cInfo.name)
+	info.RendererInfoData = cInfo.RendererInfoData
 	return 0, nil
 }
 
@@ -2705,7 +2705,6 @@ func GetTicks() uint32 {
 // GetVersion returns the version of SDL that is linked against your program.
 // (https://wiki.libsdl.org/SDL_GetVersion)
 func GetVersion(v *Version) {
-	// TODO change this to return a Version instead
 	getVersion.Call(uintptr(unsafe.Pointer(v)))
 }
 
@@ -2965,16 +2964,18 @@ func JoystickUpdate() {
 // LoadDollarTemplates loads Dollar Gesture templates from a file.
 // (https://wiki.libsdl.org/SDL_LoadDollarTemplates)
 func LoadDollarTemplates(t TouchID, src *RWops) int {
-	// TODO
-	ret, _, _ := loadDollarTemplates.Call(uintptr(t), uintptr(unsafe.Pointer(src)))
+	// TODO passing int64 as uintptr, does it work on 32 bit OS?
+	ret, _, _ := loadDollarTemplates.Call(
+		uintptr(t),
+		uintptr(unsafe.Pointer(src)),
+	)
 	return int(ret)
 }
 
 // LoadFile loads an entire file
 // (https://wiki.libsdl.org/SDL_LoadFile)
 func LoadFile(file string) (data []byte, size int) {
-	return // TODO
-	//return RWFromFile(file, "rb").LoadFileRW(true)
+	return RWFromFile(file, "rb").LoadFileRW(true)
 }
 
 // LockAudio locks the audio device. New programs might want to use LockAudioDevice() instead.
