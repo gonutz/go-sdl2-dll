@@ -1392,7 +1392,6 @@ const TEXTINPUTEVENT_TEXT_SIZE = 32
 
 var ErrInvalidParameters = errors.New("Invalid Parameters")
 
-// TODO have a method of using a specific DLL path
 var (
 	dll = syscall.NewLazyDLL("SDL2.dll")
 
@@ -1925,15 +1924,22 @@ func BuildAudioCVT(
 	dstChannels uint8,
 	dstRate int,
 ) (converted bool, err error) {
-	// TODO
-	return
-	//switch int(C.SDL_BuildAudioCVT(cvt.cptr(), srcFormat.c(), C.Uint8(srcChannels), C.int(srcRate), dstFormat.c(), C.Uint8(dstChannels), C.int(dstRate))) {
-	//case 1:
-	//	return true, nil
-	//case 0:
-	//	return false, nil
-	//}
-	//return false, GetError()
+	ret, _, _ := buildAudioCVT.Call(
+		uintptr(unsafe.Pointer(cvt)),
+		uintptr(srcFormat),
+		uintptr(srcChannels),
+		uintptr(srcRate),
+		uintptr(dstFormat),
+		uintptr(dstChannels),
+		uintptr(dstRate),
+	)
+	if ret == 0 {
+		return false, nil
+	}
+	if ret == 1 {
+		return true, nil
+	}
+	return false, GetError()
 }
 
 // Button is used as a mask when testing buttons in buttonstate.
