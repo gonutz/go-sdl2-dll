@@ -6248,6 +6248,8 @@ func GetDisplayUsableBounds(displayIndex int) (rect Rect, err error) {
 	return
 }
 
+// Empty reports whether a rectangle has no area.
+// (https://wiki.libsdl.org/SDL_RectEmpty)
 func (a *Rect) Empty() bool {
 	return a == nil || a.W <= 0 || a.H <= 0
 }
