@@ -6329,6 +6329,8 @@ func (a *Rect) Intersect(b *Rect) (Rect, bool) {
 	return result, !result.Empty()
 }
 
+// IntersectLine calculates the intersection of a rectangle and a line segment.
+// (https://wiki.libsdl.org/SDL_IntersectRectAndLine)
 func (a *Rect) IntersectLine(X1, Y1, X2, Y2 *int32) bool {
 	if a.Empty() {
 		return false
