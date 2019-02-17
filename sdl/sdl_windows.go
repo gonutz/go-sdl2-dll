@@ -2177,11 +2177,14 @@ func FilterEvents(filter EventFilter, userdata interface{}) {
 // FilterEventsFunc run a specific function on the current event queue, removing any events for which the filter returns 0.
 // (https://wiki.libsdl.org/SDL_FilterEvents)
 func FilterEventsFunc(filter eventFilterFunc, userdata interface{}) {
-	// TODO
-	//FilterEvents(filter, userdata)
+	FilterEvents(filter, userdata)
 }
 
 type eventFilterFunc func(Event, interface{}) bool
+
+func (ef eventFilterFunc) FilterEvent(e Event, userdata interface{}) bool {
+	return ef(e, userdata)
+}
 
 // FlushEvent clears events from the event queue.
 // (https://wiki.libsdl.org/SDL_FlushEvent)
