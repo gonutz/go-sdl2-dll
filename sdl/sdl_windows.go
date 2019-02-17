@@ -16,9 +16,14 @@ import (
 	"image"
 	"image/color"
 	"reflect"
+	"runtime"
 	"syscall"
 	"unsafe"
 )
+
+func init() {
+	runtime.LockOSThread()
+}
 
 // Audio format masks.
 // (https://wiki.libsdl.org/SDL_AudioFormat)
