@@ -1604,6 +1604,7 @@ var (
 	createColorCursor                 = dll.NewProc("SDL_CreateColorCursor")
 	createCursor                      = dll.NewProc("SDL_CreateCursor")
 	createSystemCursor                = dll.NewProc("SDL_CreateSystemCursor")
+	delHintCallback                   = dll.NewProc("SDL_DelHintCallback")
 	getCursor                         = dll.NewProc("SDL_GetCursor")
 	getDefaultCursor                  = dll.NewProc("SDL_GetDefaultCursor")
 	getClosestDisplayMode             = dll.NewProc("SDL_GetClosestDisplayMode")
@@ -1878,20 +1879,35 @@ var (
 	warpMouseInWindow                 = dll.NewProc("SDL_WarpMouseInWindow")
 	getYUVConversionMode              = dll.NewProc("SDL_GetYUVConversionMode")
 	getYUVConversionModeForResolution = dll.NewProc("SDL_GetYUVConversionModeForResolution")
-
-	delHintCallback = dll.NewProc("SDL_DelHintCallback")
 )
+
+var hintCallbacks = make(map[string]HintCallbackAndData)
+
+// hintCallback returns uintptr because we use it as an argument to
+// syscall.NewCallback, which expects the function to return it.
+func hintCallback(userdata, name, oldValue, newValue uintptr) uintptr {
+	n := sdlToGoString(name)
+	if c, ok := hintCallbacks[n]; ok && c.callback != nil {
+		c.callback(c.data, n, sdlToGoString(oldValue), sdlToGoString(newValue))
+	}
+	return 0
+}
+
+var hintCallbackPtr = syscall.NewCallback(hintCallback)
 
 // AddHintCallback adds a function to watch a particular hint.
 // (https://wiki.libsdl.org/SDL_AddHintCallback)
 func AddHintCallback(name string, fn HintCallback, data interface{}) {
-	// TODO
-	//_name := C.CString(name)
-	//hintCallbacks[name] = HintCallbackAndData{
-	//	callback: fn,
-	//	data:     data,
-	//}
-	//C.addHintCallback(_name)
+	hintCallbacks[name] = HintCallbackAndData{
+		callback: fn,
+		data:     data,
+	}
+	n := append([]byte(name), 0)
+	addHintCallback.Call(
+		uintptr(unsafe.Pointer(&n[0])),
+		hintCallbackPtr,
+		0,
+	)
 }
 
 // AudioInit initializes a particular audio driver.
@@ -2103,9 +2119,13 @@ func DelEventWatch(handle EventWatchHandle) {
 // DelHintCallback removes a function watching a particular hint.
 // (https://wiki.libsdl.org/SDL_DelHintCallback)
 func DelHintCallback(name string) {
-	//_name := C.CString(name)
-	//delete(hintCallbacks, name)
-	//C.delHintCallback(_name)
+	delete(hintCallbacks, name)
+	n := append([]byte(name), 0)
+	delHintCallback.Call(
+		uintptr(unsafe.Pointer(&n[0])),
+		hintCallbackPtr,
+		0,
+	)
 }
 
 // Delay waits a specified number of milliseconds before returning.
@@ -8841,6 +8861,9 @@ func GetYUVConversionModeForResolution(width, height int) YUV_CONVERSION_MODE {
 }
 
 func sdlToGoString(p uintptr) string {
+	if p == 0 {
+		return ""
+	}
 	var buf []byte
 	for b := *((*byte)(unsafe.Pointer(p))); b != 0; b = *((*byte)(unsafe.Pointer(p))) {
 		buf = append(buf, b)
