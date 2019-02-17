@@ -3320,20 +3320,40 @@ func PauseAudioDevice(dev AudioDeviceID, pauseOn bool) {
 // PeepEvents checks the event queue for messages and optionally returns them.
 // (https://wiki.libsdl.org/SDL_PeepEvents)
 func PeepEvents(events []Event, action EventAction, minType, maxType uint32) (storedEvents int, err error) {
-	// TODO look at what the original version does and figure out why
+	var _events []CEvent = make([]CEvent, len(events))
+
+	if action == ADDEVENT { // the contents of _events matter if they are to be added
+		for i := 0; i < len(events); i++ {
+			_events[i] = *cEvent(events[i])
+		}
+	}
+
 	ret, _, _ := peepEvents.Call(
-		uintptr(unsafe.Pointer(&events[0])),
+		uintptr(unsafe.Pointer(&_events[0])),
 		uintptr(len(events)),
 		uintptr(action),
 		uintptr(minType),
 		uintptr(maxType),
 	)
 	storedEvents = int(ret)
-	if ret > uintptr(len(events)) {
-		err = GetError()
-		storedEvents = -1
+
+	if action != ADDEVENT { // put events into slice, events unchanged if action = ADDEVENT
+		for i := 0; i < storedEvents; i++ {
+			events[i] = goEvent(&_events[i])
+		}
 	}
+
+	if storedEvents < 0 {
+		err = GetError()
+	}
+
 	return
+}
+
+func cEvent(event Event) *CEvent {
+	evv := reflect.ValueOf(event)
+	p := evv.Elem()
+	return (*CEvent)(unsafe.Pointer(p.UnsafeAddr()))
 }
 
 // PixelFormatEnumToMasks converts one of the enumerated pixel formats to a bpp value and RGBA masks.
