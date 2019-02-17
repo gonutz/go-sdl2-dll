@@ -3382,13 +3382,13 @@ func PumpEvents() {
 // PushEvent adds an event to the event queue.
 // (https://wiki.libsdl.org/SDL_PushEvent)
 func PushEvent(event Event) (filtered bool, err error) {
-	// TODO
-	//_event := (*C.SDL_Event)(unsafe.Pointer(cEvent(event)))
-	//if ok := int(C.SDL_PushEvent(_event)); ok < 0 {
-	//	filtered, err = false, GetError()
-	//} else if ok == 0 {
-	//	filtered, err = true, nil
-	//}
+	e := cEvent(event)
+	ret, _, _ := pushEvent.Call(uintptr(unsafe.Pointer(e)))
+	if int(ret) < 0 {
+		filtered, err = false, GetError()
+	} else if ret == 0 {
+		filtered, err = true, nil
+	}
 	return
 }
 
