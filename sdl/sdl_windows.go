@@ -17,6 +17,7 @@ import (
 	"image/color"
 	"reflect"
 	"runtime"
+	"sync"
 	"syscall"
 	"unsafe"
 )
@@ -1455,6 +1456,7 @@ var (
 	getDisplayDPI                     = dll.NewProc("SDL_GetDisplayDPI")
 	getDisplayName                    = dll.NewProc("SDL_GetDisplayName")
 	eventState                        = dll.NewProc("SDL_EventState")
+	filterEvents                      = dll.NewProc("SDL_FilterEvents")
 	getHint                           = dll.NewProc("SDL_GetHint")
 	getKeyName                        = dll.NewProc("SDL_GetKeyName")
 	getKeyboardState                  = dll.NewProc("SDL_GetKeyboardState")
@@ -1563,6 +1565,7 @@ var (
 	setClipboardText                  = dll.NewProc("SDL_SetClipboardText")
 	setCursor                         = dll.NewProc("SDL_SetCursor")
 	setError                          = dll.NewProc("SDL_SetError")
+	setEventFilter                    = dll.NewProc("SDL_SetEventFilter")
 	setHint                           = dll.NewProc("SDL_SetHint")
 	setHintWithPriority               = dll.NewProc("SDL_SetHintWithPriority")
 	setModState                       = dll.NewProc("SDL_SetModState")
@@ -1614,6 +1617,7 @@ var (
 	pollEvent                         = dll.NewProc("SDL_PollEvent")
 	waitEvent                         = dll.NewProc("SDL_WaitEvent")
 	waitEventTimeout                  = dll.NewProc("SDL_WaitEventTimeout")
+	addEventWatch                     = dll.NewProc("SDL_AddEventWatch")
 	getTouchFinger                    = dll.NewProc("SDL_GetTouchFinger")
 	gameControllerFromInstanceID      = dll.NewProc("SDL_GameControllerFromInstanceID")
 	gameControllerOpen                = dll.NewProc("SDL_GameControllerOpen")
@@ -1885,7 +1889,7 @@ var hintCallbacks = make(map[string]HintCallbackAndData)
 
 // hintCallback returns uintptr because we use it as an argument to
 // syscall.NewCallback, which expects the function to return it.
-func hintCallback(userdata, name, oldValue, newValue uintptr) uintptr {
+func theHintCallback(userdata, name, oldValue, newValue uintptr) uintptr {
 	n := sdlToGoString(name)
 	if c, ok := hintCallbacks[n]; ok && c.callback != nil {
 		c.callback(c.data, n, sdlToGoString(oldValue), sdlToGoString(newValue))
@@ -1893,7 +1897,7 @@ func hintCallback(userdata, name, oldValue, newValue uintptr) uintptr {
 	return 0
 }
 
-var hintCallbackPtr = syscall.NewCallback(hintCallback)
+var hintCallbackPtr = syscall.NewCallback(theHintCallback)
 
 // AddHintCallback adds a function to watch a particular hint.
 // (https://wiki.libsdl.org/SDL_AddHintCallback)
@@ -2107,13 +2111,15 @@ func CreateWindowAndRenderer(w, h int32, flags uint32) (*Window, *Renderer, erro
 // DelEventWatch removes an event watch callback added with AddEventWatch().
 // (https://wiki.libsdl.org/SDL_DelEventWatch)
 func DelEventWatch(handle EventWatchHandle) {
-	// TODO
-	//context, ok := eventWatches[handle]
-	//if !ok {
-	//	return
-	//}
-	//delete(eventWatches, context.handle)
-	//C.delEventWatch(context.cptr())
+	context, ok := eventWatches[handle]
+	if !ok {
+		return
+	}
+	delete(eventWatches, context.handle)
+	delEventWatch.Call(
+		eventFilterCallbackPtr,
+		uintptr(context.handle),
+	)
 }
 
 // DelHintCallback removes a function watching a particular hint.
@@ -2189,9 +2195,11 @@ func EventState(typ uint32, state int) uint8 {
 // FilterEvents run a specific filter function on the current event queue, removing any events for which the filter returns 0.
 // (https://wiki.libsdl.org/SDL_FilterEvents)
 func FilterEvents(filter EventFilter, userdata interface{}) {
-	// TODO
-	//context := newEventFilterCallbackContext(filter, userdata)
-	//C.filterEvents(context.cptr())
+	context := newEventFilterCallbackContext(filter, userdata)
+	filterEvents.Call(
+		eventFilterCallbackPtr,
+		uintptr(context.handle),
+	)
 }
 
 // FilterEventsFunc run a specific function on the current event queue, removing any events for which the filter returns 0.
@@ -3440,30 +3448,39 @@ func SetError(err error) {
 // SetEventFilter sets up a filter to process all events before they change internal state and are posted to the internal event queue.
 // (https://wiki.libsdl.org/SDL_SetEventFilter)
 func SetEventFilter(filter EventFilter, userdata interface{}) {
-	// TODO
-	//if eventFilterCache == nil && filter == nil {
-	//	// nothing to do...
-	//	return
-	//}
-	//
-	//if eventFilterCache == nil && filter != nil {
-	//	// We had no event filter before and do now; lets set
-	//	// goSetEventFilterCallback() as the event filter.
-	//	C.setEventFilter()
-	//} else if eventFilterCache != nil && filter == nil {
-	//	// We had an event filter before, but no longer do, lets clear the
-	//	// event filter
-	//	C.clearEventFilter()
-	//}
-	//
-	//eventFilterCache = filter
+	if eventFilterCache == nil && filter == nil {
+		// nothing to do...
+		return
+	}
+
+	if eventFilterCache == nil && filter != nil {
+		// We had no event filter before and do now; lets set
+		// goSetEventFilterCallback() as the event filter.
+		setEventFilter.Call(setEventFilterCallbackPtr, 0)
+	} else if eventFilterCache != nil && filter == nil {
+		// We had an event filter before, but no longer do, lets clear the
+		// event filter
+		setEventFilter.Call(0, 0)
+	}
+
+	eventFilterCache = filter
 }
+
+func theSetEventFilterCallback(data, event uintptr) uintptr {
+	// No check for eventFilterCache != nil. Why? because it should never be
+	// nil since the callback is set/unset based on the last filter being nil
+	// /non-nil. If there is an issue, then it should panic here so we can
+	// figure out why that is.
+
+	return wrapEventFilterCallback(eventFilterCache, event, nil)
+}
+
+var setEventFilterCallbackPtr = syscall.NewCallback(theSetEventFilterCallback)
 
 // SetEventFilterFunc sets up a function to process all events before they change internal state and are posted to the internal event queue.
 // (https://wiki.libsdl.org/SDL_SetEventFilter)
 func SetEventFilterFunc(filterFunc eventFilterFunc, userdata interface{}) {
-	// TODO
-	//SetEventFilter(filterFunc, userdata)
+	SetEventFilter(filterFunc, userdata)
 }
 
 // SetHint sets a hint with normal priority.
@@ -4496,19 +4513,70 @@ func GetEventFilter() EventFilter {
 	return eventFilterCache
 }
 
-var eventFilterCache EventFilter // TODO do what is done in the original with this
-
 // EventWatchHandle is an event watch callback added with AddEventWatch().
 type EventWatchHandle uintptr
 
 // AddEventWatch adds a callback to be triggered when an event is added to the event queue.
 // (https://wiki.libsdl.org/SDL_AddEventWatch)
 func AddEventWatch(filter EventFilter, userdata interface{}) EventWatchHandle {
-	// TODO
-	return 0
-	//context := newEventFilterCallbackContext(filter, userdata)
+	context := newEventFilterCallbackContext(filter, userdata)
+	addEventWatch.Call(
+		eventFilterCallbackPtr,
+		uintptr(context.handle),
+	)
 	//C.addEventWatch(context.cptr())
-	//return context.handle
+	return context.handle
+}
+
+func theEventFilterCallback(userdata, event uintptr) uintptr {
+	// same sort of reasoning with goSetEventFilterCallback, userdata should
+	// always be non-nil and represent a valid eventFilterCallbackContext. If
+	// it doesn't a panic will let us know that there something wrong and the
+	// problem can be fixed.
+
+	context := eventWatches[EventWatchHandle(userdata)]
+	return wrapEventFilterCallback(context.filter, event, context.userdata)
+}
+
+var eventFilterCallbackPtr = syscall.NewCallback(theEventFilterCallback)
+
+func wrapEventFilterCallback(filter EventFilter, e uintptr, userdata interface{}) uintptr {
+	gev := goEvent((*CEvent)(unsafe.Pointer(e)))
+	result := filter.FilterEvent(gev, userdata)
+	if result {
+		return 1
+	}
+	return 0
+}
+
+func newEventFilterCallbackContext(filter EventFilter, userdata interface{}) *eventFilterCallbackContext {
+	lastEventWatchHandleMutex.Lock()
+	defer lastEventWatchHandleMutex.Unlock()
+	// Look for the next available watch handle (this should be immediate
+	// unless you're creating a LOT of handlers).
+	for {
+		if _, ok := eventWatches[lastEventWatchHandle]; !ok {
+			break
+		}
+		lastEventWatchHandle++
+	}
+	e := &eventFilterCallbackContext{filter, lastEventWatchHandle, userdata}
+	eventWatches[lastEventWatchHandle] = e
+	lastEventWatchHandle++
+	return e
+}
+
+var (
+	eventFilterCache          EventFilter
+	eventWatches              = make(map[EventWatchHandle]*eventFilterCallbackContext)
+	lastEventWatchHandleMutex sync.Mutex
+	lastEventWatchHandle      EventWatchHandle
+)
+
+type eventFilterCallbackContext struct {
+	filter   EventFilter
+	handle   EventWatchHandle
+	userdata interface{}
 }
 
 // AddEventWatchFunc adds a callback function to be triggered when an event is added to the event queue.
