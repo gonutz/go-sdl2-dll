@@ -3390,11 +3390,11 @@ func QueueAudio(dev AudioDeviceID, data []byte) error {
 // (https://wiki.libsdl.org/SDL_Quit)
 func Quit() {
 	quit.Call()
-	// TODO
-	//eventFilterCache = nil
-	//for k := range eventWatches {
-	//	delete(eventWatches, k)
-	//}
+
+	eventFilterCache = nil
+	for k := range eventWatches {
+		delete(eventWatches, k)
+	}
 }
 
 // QuitSubSystem shuts down specific SDL subsystems.
