@@ -22,6 +22,7 @@ import (
 )
 
 func init() {
+	// Make sure the main goroutine is bound to the main thread.
 	runtime.LockOSThread()
 }
 
