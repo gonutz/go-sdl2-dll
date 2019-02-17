@@ -1533,6 +1533,7 @@ var (
 	logMessage                        = dll.NewProc("SDL_LogMessage")
 	logResetPriorities                = dll.NewProc("SDL_LogResetPriorities")
 	logSetAllPriority                 = dll.NewProc("SDL_LogSetAllPriority")
+	logSetOutputFunction              = dll.NewProc("SDL_LogSetOutputFunction")
 	logSetPriority                    = dll.NewProc("SDL_LogSetPriority")
 	logVerbose                        = dll.NewProc("SDL_LogVerbose")
 	logWarn                           = dll.NewProc("SDL_LogWarn")
@@ -3090,15 +3091,39 @@ func LogSetAllPriority(p LogPriority) {
 // LogSetOutputFunction replaces the default log output function with one of your own.
 // (https://wiki.libsdl.org/SDL_LogSetOutputFunction)
 func LogSetOutputFunction(f LogOutputFunction, data interface{}) {
-	// TODO
-	//ctx := &logOutputFunctionCtx{
-	//	f: f,
-	//	d: data,
-	//}
+	ctx := &logOutputFunctionCtx{
+		f: f,
+		d: data,
+	}
 	//C.LogSetOutputFunction(unsafe.Pointer(ctx))
-	//logOutputFunctionCache = f
-	//logOutputDataCache = data
+	logSetOutputFunction.Call(
+		logOutputFunctionPtr,
+		uintptr(unsafe.Pointer(&ctx)),
+	)
+	logOutputFunctionCache = f
+	logOutputDataCache = data
 }
+
+// Yissakhar Z. Beck (DeedleFake)'s implementation
+//
+//export logOutputFunction
+func theLogOutputFunction(data uintptr, category int, pri LogPriority, message uintptr) uintptr {
+	ctx := (*logOutputFunctionCtx)(unsafe.Pointer(data))
+	ctx.f(ctx.d, category, pri, sdlToGoString(message))
+	return 0
+}
+
+var logOutputFunctionPtr = syscall.NewCallback(theLogOutputFunction)
+
+type logOutputFunctionCtx struct {
+	f LogOutputFunction
+	d interface{}
+}
+
+var (
+	logOutputFunctionCache LogOutputFunction
+	logOutputDataCache     interface{}
+)
 
 // LogSetPriority sets the priority of a particular log category.
 // (https://wiki.libsdl.org/SDL_LogSetPriority)
