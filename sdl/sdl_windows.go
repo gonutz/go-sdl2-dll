@@ -4648,9 +4648,7 @@ type eventFilterCallbackContext struct {
 // AddEventWatchFunc adds a callback function to be triggered when an event is added to the event queue.
 // (https://wiki.libsdl.org/SDL_AddEventWatch)
 func AddEventWatchFunc(filterFunc eventFilterFunc, userdata interface{}) EventWatchHandle {
-	// TODO
-	return 0
-	//return AddEventWatch(filterFunc, userdata)
+	return AddEventWatch(filterFunc, userdata)
 }
 
 // Finger contains touch information.
@@ -5617,9 +5615,7 @@ type LogOutputFunction func(data interface{}, category int, pri LogPriority, mes
 // LogGetOutputFunction returns the current log output function.
 // (https://wiki.libsdl.org/SDL_LogGetOutputFunction)
 func LogGetOutputFunction() (LogOutputFunction, interface{}) {
-	// TODO
-	return nil, nil
-	//return logOutputFunctionCache, logOutputDataCache
+	return logOutputFunctionCache, logOutputDataCache
 }
 
 // LogPriority is a predefined log priority.
@@ -6826,7 +6822,7 @@ func (renderer *Renderer) DrawLine(x1, y1, x2, y2 int32) error {
 // (https://wiki.libsdl.org/SDL_RenderDrawLines)
 func (renderer *Renderer) DrawLines(points []Point) error {
 	if points == nil {
-		return nil // TODO this check should be in the original
+		return nil
 	}
 	ret, _, _ := renderDrawLines.Call(
 		uintptr(unsafe.Pointer(renderer)),
@@ -6851,7 +6847,7 @@ func (renderer *Renderer) DrawPoint(x, y int32) error {
 // (https://wiki.libsdl.org/SDL_RenderDrawPoints)
 func (renderer *Renderer) DrawPoints(points []Point) error {
 	if points == nil {
-		return nil // TODO this should be in the original as well
+		return nil
 	}
 	ret, _, _ := renderDrawPoints.Call(
 		uintptr(unsafe.Pointer(renderer)),
@@ -6875,7 +6871,7 @@ func (renderer *Renderer) DrawRect(rect *Rect) error {
 // (https://wiki.libsdl.org/SDL_RenderDrawRects)
 func (renderer *Renderer) DrawRects(rects []Rect) error {
 	if rects == nil {
-		return nil // TODO this should be in the original as well
+		return nil
 	}
 	ret, _, _ := renderDrawRects.Call(
 		uintptr(unsafe.Pointer(renderer)),
@@ -6899,7 +6895,7 @@ func (renderer *Renderer) FillRect(rect *Rect) error {
 // (https://wiki.libsdl.org/SDL_RenderFillRects)
 func (renderer *Renderer) FillRects(rects []Rect) error {
 	if rects == nil {
-		return nil // TODO this should be in the original as well
+		return nil
 	}
 	ret, _, _ := renderFillRects.Call(
 		uintptr(unsafe.Pointer(renderer)),
@@ -7294,7 +7290,7 @@ func (sensor *Sensor) Close() {
 // (https://wiki.libsdl.org/SDL_SensorGetData)
 func (sensor *Sensor) GetData(data []float32) (err error) {
 	if data == nil {
-		return nil // TODO should this be in the original too?
+		return nil
 	}
 	ret, _, _ := sensorGetData.Call(
 		uintptr(unsafe.Pointer(sensor)),
@@ -7674,7 +7670,7 @@ func (surface *Surface) FillRect(rect *Rect, color uint32) error {
 // (https://wiki.libsdl.org/SDL_FillRects)
 func (surface *Surface) FillRects(rects []Rect, color uint32) error {
 	if rects == nil {
-		return nil // TODO this should be in the original as well
+		return nil
 	}
 	ret, _, _ := fillRects.Call(
 		uintptr(unsafe.Pointer(surface)),
@@ -8261,7 +8257,7 @@ func (texture *Texture) Unlock() {
 // (https://wiki.libsdl.org/SDL_UpdateTexture)
 func (texture *Texture) Update(rect *Rect, pixels []byte, pitch int) error {
 	if pixels == nil {
-		return nil // TODO this should be in the original as well
+		return nil
 	}
 	ret, _, _ := updateTexture.Call(
 		uintptr(unsafe.Pointer(texture)),
@@ -8276,7 +8272,7 @@ func (texture *Texture) Update(rect *Rect, pixels []byte, pitch int) error {
 // (https://wiki.libsdl.org/SDL_UpdateTexture)
 func (texture *Texture) UpdateRGBA(rect *Rect, pixels []uint32, pitch int) error {
 	if pixels == nil {
-		return nil // TODO this should be in the original as well
+		return nil
 	}
 	ret, _, _ := updateTexture.Call(
 		uintptr(unsafe.Pointer(texture)),
@@ -8290,7 +8286,6 @@ func (texture *Texture) UpdateRGBA(rect *Rect, pixels []uint32, pitch int) error
 // UpdateYUV updates a rectangle within a planar YV12 or IYUV texture with new pixel data.
 // (https://wiki.libsdl.org/SDL_UpdateYUVTexture)
 func (texture *Texture) UpdateYUV(rect *Rect, yPlane []byte, yPitch int, uPlane []byte, uPitch int, vPlane []byte, vPitch int) error {
-	// TODO handle nil []bytes in the original as well
 	var yPlanePtr, uPlanePtr, vPlanePtr uintptr
 	if yPlane != nil {
 		yPlanePtr = uintptr(unsafe.Pointer(&yPlane[0]))
@@ -8867,7 +8862,7 @@ func (window *Window) UpdateSurface() error {
 // (https://wiki.libsdl.org/SDL_UpdateWindowSurfaceRects)
 func (window *Window) UpdateSurfaceRects(rects []Rect) error {
 	if rects == nil {
-		return nil // TODO this should be in the original as well
+		return nil
 	}
 	ret, _, _ := updateWindowSurfaceRects.Call(
 		uintptr(unsafe.Pointer(window)),
