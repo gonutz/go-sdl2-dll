@@ -3171,7 +3171,28 @@ func LogWarn(category int, str string, args ...interface{}) {
 // 		os.Exit(exitcode)
 // 	}
 func Main(main func()) {
-	// TODO
+	// Queue of functions that are thread-sensitive
+	callQueue := make(chan func())
+
+	// Properly initialize callInMain for use by sdl.Do(..)
+	callInMain = func(f func()) {
+		done := make(chan bool, 1)
+		callQueue <- func() {
+			f()
+			done <- true
+		}
+		<-done
+	}
+
+	go func() {
+		main()
+		// fmt.Println("END") // to check if os.Exit(..) is called by main() above
+		close(callQueue)
+	}()
+
+	for f := range callQueue {
+		f()
+	}
 }
 
 // MapRGB maps an RGB triple to an opaque pixel value for a given pixel format.
