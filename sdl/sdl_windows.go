@@ -3073,22 +3073,6 @@ func GetNumVideoDrivers() (int, error) {
 	return int(ret), errorFromInt(int(ret))
 }
 
-// GetPerformanceCounter returns the current value of the high resolution counter.
-// (https://wiki.libsdl.org/SDL_GetPerformanceCounter)
-func GetPerformanceCounter() uint64 {
-	// TODO what about 32 bit OS?
-	ret, _, _ := getPerformanceCounter.Call()
-	return uint64(ret)
-}
-
-// GetPerformanceFrequency returns the count per second of the high resolution counter.
-// (https://wiki.libsdl.org/SDL_GetPerformanceFrequency)
-func GetPerformanceFrequency() uint64 {
-	// TODO what about 32 bit OS?
-	ret, _, _ := getPerformanceFrequency.Call()
-	return uint64(ret)
-}
-
 // GetPixelFormatName returns the human readable name of a pixel format.
 // (https://wiki.libsdl.org/SDL_GetPixelFormatName)
 func GetPixelFormatName(format uint) string {
