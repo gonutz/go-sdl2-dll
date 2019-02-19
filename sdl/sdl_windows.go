@@ -6725,17 +6725,6 @@ func (rwops *RWops) WriteBE32(value uint32) uint {
 	return uint(ret)
 }
 
-// WriteBE64 writes 64 bits in native format to the RWops as big-endian data.
-// (https://wiki.libsdl.org/SDL_WriteBE64)
-func (rwops *RWops) WriteBE64(value uint64) uint {
-	if rwops == nil {
-		return 0
-	}
-	// TODO what about 32 bit OS? uintptr is 32 bit there
-	ret, _, _ := writeBE64.Call(uintptr(unsafe.Pointer(rwops)), uintptr(value))
-	return uint(ret)
-}
-
 // WriteLE16 writes 16 bits in native format to the RWops as little-endian data.
 // (https://wiki.libsdl.org/SDL_WriteLE16)
 func (rwops *RWops) WriteLE16(value uint16) uint {
@@ -6753,17 +6742,6 @@ func (rwops *RWops) WriteLE32(value uint32) uint {
 		return 0
 	}
 	ret, _, _ := writeLE32.Call(uintptr(unsafe.Pointer(rwops)), uintptr(value))
-	return uint(ret)
-}
-
-// WriteLE64 writes 64 bits in native format to the RWops as little-endian data.
-// (https://wiki.libsdl.org/SDL_WriteLE64)
-func (rwops *RWops) WriteLE64(value uint64) uint {
-	if rwops == nil {
-		return 0
-	}
-	// TODO what about 32 bit OS? uintptr is 32 bit there
-	ret, _, _ := writeLE64.Call(uintptr(unsafe.Pointer(rwops)), uintptr(value))
 	return uint(ret)
 }
 
