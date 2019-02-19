@@ -23,8 +23,14 @@ import (
 )
 
 func main() {
+	checkFile("sdl_windows.go")
+	checkFile("sdl_windows_386.go")
+	checkFile("sdl_windows_amd64.go")
+}
+
+func checkFile(path string) {
 	// load the SDL2 code here and parse it
-	funcs, err := ioutil.ReadFile("sdl_windows.go")
+	funcs, err := ioutil.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
@@ -80,7 +86,7 @@ func main() {
 		// they are called sdlError and sdlInit. We need to account for them.
 		if !(v == f || v == "sdl"+f) {
 			// we have a mismatch!
-			fmt.Println(fv.varName, "loads", fv.loadedFunc)
+			fmt.Println(path, fv.varName, "loads", fv.loadedFunc)
 		}
 	}
 
@@ -202,7 +208,7 @@ func main() {
 			}
 		}
 		if !ok {
-			fmt.Println(c.typeName, c.apiFunc, c.dllCalls)
+			fmt.Println(path, c.typeName, c.apiFunc, c.dllCalls)
 		}
 	}
 }
