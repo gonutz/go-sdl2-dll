@@ -8076,6 +8076,16 @@ type TextEditingEvent struct {
 	Length    int32                          // the number of characters to edit from the start point
 }
 
+// GetText returns the text as string.
+func (e *TextEditingEvent) GetText() string {
+	for i, b := range e.Text {
+		if b == 0 {
+			return string(e.Text[:i])
+		}
+	}
+	return string(e.Text[:])
+}
+
 // GetTimestamp returns the timestamp of the event.
 func (e *TextEditingEvent) GetTimestamp() uint32 {
 	return e.Timestamp
@@ -8093,6 +8103,16 @@ type TextInputEvent struct {
 	Timestamp uint32                         // timestamp of the event
 	WindowID  uint32                         // the window with keyboard focus, if any
 	Text      [TEXTINPUTEVENT_TEXT_SIZE]byte // the null-terminated input text in UTF-8 encoding
+}
+
+// GetText returns the text as string.
+func (e *TextInputEvent) GetText() string {
+	for i, b := range e.Text {
+		if b == 0 {
+			return string(e.Text[:i])
+		}
+	}
+	return string(e.Text[:])
 }
 
 // GetTimestamp returns the timestamp of the event.
