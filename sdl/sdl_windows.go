@@ -1598,6 +1598,7 @@ var (
 	warpMouseGlobal                   = dll.NewProc("SDL_WarpMouseGlobal")
 	wasInit                           = dll.NewProc("SDL_WasInit")
 	openAudioDevice                   = dll.NewProc("SDL_OpenAudioDevice")
+	loadWAV_RW                        = dll.NewProc("SDL_LoadWAV_RW")
 	getAudioDeviceStatus              = dll.NewProc("SDL_GetAudioDeviceStatus")
 	getAudioStatus                    = dll.NewProc("SDL_GetAudioStatus")
 	newAudioStream                    = dll.NewProc("SDL_NewAudioStream")
@@ -2088,6 +2089,7 @@ func LoadDLL(file string) error {
 	warpMouseGlobal = dll.NewProc("SDL_WarpMouseGlobal")
 	wasInit = dll.NewProc("SDL_WasInit")
 	openAudioDevice = dll.NewProc("SDL_OpenAudioDevice")
+	loadWAV_RW = dll.NewProc("SDL_LoadWAV_RW")
 	getAudioDeviceStatus = dll.NewProc("SDL_GetAudioDeviceStatus")
 	getAudioStatus = dll.NewProc("SDL_GetAudioStatus")
 	newAudioStream = dll.NewProc("SDL_NewAudioStream")
@@ -4277,12 +4279,15 @@ type AudioCVT struct {
 	LenRatio    float64         // given len, final size is len*len_ratio
 	filters     [10]AudioFilter // filter list (internal use)
 	filterIndex int32           // current audio conversion function (internal use)
+	bufData     []byte
 }
 
 // AllocBuf allocates the requested memory for AudioCVT buffer.
 func (cvt *AudioCVT) AllocBuf(size uintptr) {
-	// TODO
-	//cvt.Buf = C.malloc(C.size_t(size))
+	cvt.bufData = make([]byte, size)
+	if size != 0 {
+		cvt.Buf = unsafe.Pointer(&cvt.bufData[0])
+	}
 }
 
 // BufAsSlice returns AudioCVT.buf as byte slice.
@@ -4298,13 +4303,13 @@ func (cvt AudioCVT) BufAsSlice() []byte {
 
 // FreeBuf deallocates the memory previously allocated from AudioCVT buffer.
 func (cvt *AudioCVT) FreeBuf() {
-	// TODO
-	//C.free(cvt.Buf)
+	cvt.Buf = nil
+	cvt.bufData = nil
 }
 
 // AudioCallback is a function to call when the audio device needs more data.
 // (https://wiki.libsdl.org/SDL_AudioSpec)
-type AudioCallback uintptr // TODO this is a function pointer in C
+type AudioCallback uintptr
 
 // AudioDeviceEvent contains audio device event information.
 // (https://wiki.libsdl.org/SDL_AudioDeviceEvent)
@@ -4355,7 +4360,7 @@ func OpenAudioDevice(device string, isCapture bool, desired, obtained *AudioSpec
 
 // AudioFilter is the filter list used in AudioCVT() (internal use)
 // (https://wiki.libsdl.org/SDL_AudioCVT)
-type AudioFilter uintptr // TODO this is a function pointer in C
+type AudioFilter uintptr
 
 // AudioFormat is an enumeration of audio formats.
 // (https://wiki.libsdl.org/SDL_AudioFormat)
@@ -4420,40 +4425,29 @@ type AudioSpec struct {
 // LoadWAV loads a WAVE from a file.
 // (https://wiki.libsdl.org/SDL_LoadWAV)
 func LoadWAV(file string) ([]byte, *AudioSpec) {
-	// TODO
-	return nil, nil
-	//_file := C.CString(file)
-	//_rb := C.CString("rb")
-	//defer C.free(unsafe.Pointer(_file))
-	//defer C.free(unsafe.Pointer(_rb))
-	//
-	//var _audioBuf *C.Uint8
-	//var _audioLen C.Uint32
-	//audioSpec := (*AudioSpec)(unsafe.Pointer(C.SDL_LoadWAV_RW(C.SDL_RWFromFile(_file, _rb), 1, (&AudioSpec{}).cptr(), &_audioBuf, &_audioLen)))
-	//
-	//var b []byte
-	//sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	//sliceHeader.Len = (int)(_audioLen)
-	//sliceHeader.Cap = (int)(_audioLen)
-	//sliceHeader.Data = uintptr(unsafe.Pointer(_audioBuf))
-	//return b, audioSpec
+	return LoadWAVRW(RWFromFile(file, "rb"), true)
 }
 
 // LoadWAVRW loads a WAVE from the data source, automatically freeing that source if freeSrc is true.
 // (https://wiki.libsdl.org/SDL_LoadWAV_RW)
 func LoadWAVRW(src *RWops, freeSrc bool) ([]byte, *AudioSpec) {
-	// TODO
-	return nil, nil
-	//var _audioBuf *C.Uint8
-	//var _audioLen C.Uint32
-	//audioSpec := (*AudioSpec)(unsafe.Pointer(C.SDL_LoadWAV_RW(src.cptr(), C.int(Btoi(freeSrc)), (&AudioSpec{}).cptr(), &_audioBuf, &_audioLen)))
-	//
-	//var b []byte
-	//sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	//sliceHeader.Len = (int)(_audioLen)
-	//sliceHeader.Cap = (int)(_audioLen)
-	//sliceHeader.Data = uintptr(unsafe.Pointer(_audioBuf))
-	//return b, audioSpec
+	var spec AudioSpec
+	var buf *uint8
+	var length uint32
+	loadWAV_RW.Call(
+		uintptr(unsafe.Pointer(src)),
+		uintptr(Btoi(freeSrc)),
+		uintptr(unsafe.Pointer(&spec)),
+		uintptr(unsafe.Pointer(&buf)),
+		uintptr(unsafe.Pointer(&length)),
+	)
+
+	var b []byte
+	sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+	sliceHeader.Len = int(length)
+	sliceHeader.Cap = int(length)
+	sliceHeader.Data = uintptr(unsafe.Pointer(buf))
+	return b, &spec
 }
 
 // AudioStatus is an enumeration of audio device states.
@@ -6520,22 +6514,16 @@ func (rwops *RWops) Free() error {
 // LoadFile_RW loads all the data from an SDL data stream.
 // (https://wiki.libsdl.org/SDL_LoadFile_RW)
 func (src *RWops) LoadFileRW(freesrc bool) (data []byte, size int) {
-	// TODO
+	ret, _, _ := loadFile_RW.Call(
+		uintptr(unsafe.Pointer(src)),
+		uintptr(unsafe.Pointer(&size)),
+		uintptr(Btoi(freesrc)),
+	)
+	sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
+	sliceHeader.Cap = size
+	sliceHeader.Len = size
+	sliceHeader.Data = ret
 	return
-	//var _size C.size_t
-	//var _freesrc C.int = 0
-	//
-	//if freesrc {
-	//	_freesrc = 1
-	//}
-	//
-	//_data := C.SDL_LoadFile_RW(src.cptr(), &_size, _freesrc)
-	//sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
-	//sliceHeader.Cap = int(_size)
-	//sliceHeader.Len = int(_size)
-	//sliceHeader.Data = uintptr(_data)
-	//size = int(_size)
-	//return
 }
 
 // Read reads from a data source.
@@ -7558,19 +7546,9 @@ func (renderer *Renderer) SetDrawColor(r, g, b, a uint8) error {
 
 // SetDrawColorArray is a custom variant of SetDrawColor.
 func (renderer *Renderer) SetDrawColorArray(bs ...uint8) error {
-	// TODO
-	return nil
-	//_bs := []C.Uint8{0, 0, 0, 255}
-	//for i := 0; i < len(_bs) && i < len(bs); i++ {
-	//	_bs[i] = C.Uint8(bs[i])
-	//}
-	//return errorFromInt(int(
-	//	C.SDL_SetRenderDrawColor(
-	//		renderer.cptr(),
-	//		_bs[0],
-	//		_bs[1],
-	//		_bs[2],
-	//		_bs[3])))
+	c := [4]uint8{0, 0, 0, 255}
+	copy(c[:], bs)
+	return renderer.SetDrawColor(c[0], c[1], c[2], c[3])
 }
 
 // SetLogicalSize sets a device independent resolution for rendering.
