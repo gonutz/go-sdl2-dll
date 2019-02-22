@@ -3571,7 +3571,6 @@ func LogSetOutputFunction(f LogOutputFunction, data interface{}) {
 		f: f,
 		d: data,
 	}
-	//C.LogSetOutputFunction(unsafe.Pointer(ctx))
 	logSetOutputFunction.Call(
 		logOutputFunctionPtr,
 		uintptr(unsafe.Pointer(&ctx)),
@@ -5066,7 +5065,6 @@ func AddEventWatch(filter EventFilter, userdata interface{}) EventWatchHandle {
 		eventFilterCallbackPtr,
 		uintptr(context.handle),
 	)
-	//C.addEventWatch(context.cptr())
 	return context.handle
 }
 
@@ -5075,7 +5073,6 @@ func theEventFilterCallback(userdata, event uintptr) uintptr {
 	// always be non-nil and represent a valid eventFilterCallbackContext. If
 	// it doesn't a panic will let us know that there something wrong and the
 	// problem can be fixed.
-
 	context := eventWatches[EventWatchHandle(userdata)]
 	return wrapEventFilterCallback(context.filter, event, context.userdata)
 }
