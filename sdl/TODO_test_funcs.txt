@@ -1,0 +1,624 @@
+This is a list of all exported functions to keep track of which ones are already tested.
+	indented means tested
+not indented is not tested yet
+
+-----------------------------------------
+
+	AddEventWatch
+	AddEventWatchFunc
+	AddHintCallback
+AllocBuf (AudioCVT)
+AllocFormat
+AllocPalette
+AllocRW
+At (Surface)
+Attached (GameController)
+Attached (Joystick)
+AudioInit
+AudioQuit
+Available (AudioStream)
+Axis (GameController)
+Axis (GameControllerButtonBind)
+Axis (Joystick)
+AxisInitialState (Joystick)
+Ball (Joystick)
+BindForAxis (GameController)
+BindForButton (GameController)
+BitSize (AudioFormat)
+Blit (Surface)
+BlitScaled (Surface)
+Bounds (Surface)
+Broadcast (Cond)
+	Btoi
+BufAsSlice (AudioCVT)
+BuildAudioCVT
+Button
+Button (GameController)
+Button (GameControllerButtonBind)
+Button (Joystick)
+ButtonLMask
+ButtonMMask
+ButtonRMask
+ButtonX1Mask
+ButtonX2Mask
+BytesPerPixel (Surface)
+COMPILEDVERSION
+CalculateGammaRamp
+CaptureMouse
+Clear (AudioStream)
+Clear (Renderer)
+ClearError
+ClearHints
+ClearQueuedAudio
+Close (GameController)
+Close (Haptic)
+Close (Joystick)
+	Close (RWops)
+Close (Sensor)
+CloseAudio
+CloseAudioDevice
+ColorModel (Surface)
+ComposeCustomBlendMode
+Convert (Surface)
+ConvertAudio
+ConvertFormat (Surface)
+ConvertPixels
+Copy (Renderer)
+CopyEx (Renderer)
+CreateColorCursor
+CreateCond
+CreateCursor
+CreateMutex
+CreateRGBSurface
+CreateRGBSurfaceFrom
+CreateRGBSurfaceWithFormat
+CreateRGBSurfaceWithFormatFrom
+CreateRenderer
+CreateSemaphore
+CreateSoftwareRenderer
+CreateSystemCursor
+CreateTexture (Renderer)
+CreateTextureFromSurface (Renderer)
+CreateWindow
+CreateWindowAndRenderer
+CreateWindowFrom
+CurrentPowerLevel (Joystick)
+Data (Surface)
+	DelEventWatch
+	DelHintCallback
+	Delay
+DequeueAudio
+Destroy (Cond)
+Destroy (Mutex)
+Destroy (Renderer)
+Destroy (Sem)
+Destroy (Texture)
+Destroy (Window)
+DestroyEffect (Haptic)
+DisableScreenSaver
+	Do
+DrawLine (Renderer)
+DrawLines (Renderer)
+DrawPoint (Renderer)
+DrawPoints (Renderer)
+DrawRect (Renderer)
+DrawRects (Renderer)
+Duplicate (Surface)
+EffectSupported (Haptic)
+Empty (Rect)
+EnableScreenSaver
+EnclosePoints
+Equals (Rect)
+Error
+EventState
+FillRect (Renderer)
+FillRect (Surface)
+FillRects (Renderer)
+FillRects (Surface)
+FilterEvent (eventFilterFunc)
+FilterEvents
+FilterEventsFunc
+Flush (AudioStream)
+FlushEvent
+FlushEvents
+Free (AudioStream)
+Free (Palette)
+Free (PixelFormat)
+Free (RWops)
+Free (Surface)
+FreeBuf (AudioCVT)
+FreeCursor
+FreeWAV
+GLBind (Texture)
+GLCreateContext (Window)
+GLDeleteContext
+GLExtensionSupported
+GLGetAttribute
+GLGetDrawableSize (Window)
+GLGetProcAddress
+GLGetSwapInterval
+GLLoadLibrary
+GLMakeCurrent (Window)
+GLSetAttribute
+GLSetSwapInterval
+GLSwap (Window)
+GLUnbind (Texture)
+GLUnloadLibrary
+GUID (Joystick)
+GameControllerAddMapping
+GameControllerEventState
+GameControllerFromInstanceID
+GameControllerGetAxisFromString
+GameControllerGetButtonFromString
+GameControllerGetStringForAxis
+GameControllerGetStringForButton
+GameControllerMappingForGUID
+GameControllerMappingForIndex
+GameControllerNameForIndex
+GameControllerNumMappings
+GameControllerOpen
+GameControllerUpdate
+Get (AudioStream)
+GetAlphaMod (Surface)
+GetAlphaMod (Texture)
+GetAudioDeviceName
+GetAudioDeviceStatus
+GetAudioDriver
+GetAudioStatus
+GetBasePath
+GetBlendMode (Surface)
+GetBlendMode (Texture)
+GetBrightness (Window)
+GetCPUCacheLineSize
+GetCPUCount
+GetClipRect (Renderer)
+GetClipRect (Surface)
+GetClipboardText
+GetClosestDisplayMode
+GetCocoaInfo (SysWMInfo)
+GetColorKey (Surface)
+GetColorMod (Surface)
+GetCurrentAudioDriver
+GetCurrentDisplayMode
+GetCurrentVideoDriver
+GetCursor
+GetDFBInfo (SysWMInfo)
+GetData (Sensor)
+GetData (Window)
+GetDefaultCursor
+GetDesktopDisplayMode
+GetDisplayBounds
+GetDisplayDPI
+GetDisplayIndex (Window)
+GetDisplayMode
+GetDisplayMode (Window)
+GetDisplayName
+GetDisplayUsableBounds
+GetDrawBlendMode (Renderer)
+GetDrawColor (Renderer)
+GetEffectStatus (Haptic)
+GetError
+GetEventFilter
+GetEventState
+GetFlags (Window)
+GetGammaRamp (Window)
+GetGrab (Window)
+GetHint
+GetID (Window)
+GetInfo (Renderer)
+GetInstanceID (Sensor)
+GetKeyFromName
+GetKeyFromScancode
+GetKeyName
+GetKeyboardFocus
+GetKeyboardState
+GetLogicalSize (Renderer)
+GetMaximumSize (Window)
+GetMetalCommandEncoder (Renderer)
+GetMetalLayer (Renderer)
+GetMinimumSize (Window)
+GetModState
+GetMouseFocus
+GetMouseState
+GetName (Sensor)
+GetNonPortableType (Sensor)
+GetNumAudioDevices
+GetNumAudioDrivers
+GetNumDisplayModes
+GetNumRenderDrivers
+GetNumTouchDevices
+GetNumTouchFingers
+GetNumVideoDisplays
+GetNumVideoDrivers
+GetOutputSize (Renderer)
+GetPerformanceCounter
+GetPerformanceFrequency
+GetPixelFormat (Window)
+GetPixelFormatName
+GetPlatform
+GetPosition (Window)
+GetPowerInfo
+GetPrefPath
+GetQueuedAudioSize
+GetRGB
+GetRGBA
+GetRelativeMouseMode
+GetRelativeMouseState
+GetRenderDriverInfo
+GetRenderTarget (Renderer)
+GetRenderer (Window)
+GetRevision
+GetRevisionNumber
+GetScale (Renderer)
+GetScancodeFromKey
+GetScancodeFromName
+GetScancodeName
+GetSize (Window)
+GetSurface (Window)
+GetSystemRAM
+GetText (TextEditingEvent)
+GetText (TextInputEvent)
+GetTicks
+GetTimestamp (AudioDeviceEvent)
+GetTimestamp (ClipboardEvent)
+GetTimestamp (CommonEvent)
+GetTimestamp (ControllerAxisEvent)
+GetTimestamp (ControllerButtonEvent)
+GetTimestamp (ControllerDeviceEvent)
+GetTimestamp (DollarGestureEvent)
+GetTimestamp (DropEvent)
+GetTimestamp (JoyAxisEvent)
+GetTimestamp (JoyBallEvent)
+GetTimestamp (JoyButtonEvent)
+GetTimestamp (JoyDeviceAddedEvent)
+GetTimestamp (JoyDeviceRemovedEvent)
+GetTimestamp (JoyHatEvent)
+GetTimestamp (KeyboardEvent)
+GetTimestamp (MouseButtonEvent)
+GetTimestamp (MouseMotionEvent)
+GetTimestamp (MouseWheelEvent)
+GetTimestamp (MultiGestureEvent)
+GetTimestamp (OSEvent)
+GetTimestamp (QuitEvent)
+GetTimestamp (RenderEvent)
+GetTimestamp (SensorEvent)
+GetTimestamp (SysWMEvent)
+GetTimestamp (TextEditingEvent)
+GetTimestamp (TextInputEvent)
+GetTimestamp (TouchFingerEvent)
+GetTimestamp (UserEvent)
+GetTimestamp (WindowEvent)
+GetTitle (Window)
+GetTouchDevice
+GetTouchFinger
+GetType (AudioDeviceEvent)
+GetType (ClipboardEvent)
+GetType (CommonEvent)
+GetType (ControllerAxisEvent)
+GetType (ControllerButtonEvent)
+GetType (ControllerDeviceEvent)
+GetType (DollarGestureEvent)
+GetType (DropEvent)
+GetType (JoyAxisEvent)
+GetType (JoyBallEvent)
+GetType (JoyButtonEvent)
+GetType (JoyDeviceAddedEvent)
+GetType (JoyDeviceRemovedEvent)
+GetType (JoyHatEvent)
+GetType (KeyboardEvent)
+GetType (MouseButtonEvent)
+GetType (MouseMotionEvent)
+GetType (MouseWheelEvent)
+GetType (MultiGestureEvent)
+GetType (OSEvent)
+GetType (QuitEvent)
+GetType (RenderEvent)
+GetType (Sensor)
+GetType (SensorEvent)
+GetType (SysWMEvent)
+GetType (TextEditingEvent)
+GetType (TextInputEvent)
+GetType (TouchFingerEvent)
+GetType (UserEvent)
+GetType (WindowEvent)
+GetUIKitInfo (SysWMInfo)
+GetVersion
+GetVideoDriver
+GetViewport (Renderer)
+GetWMInfo (Window)
+GetWindowFromID
+GetWindowOpacity (Window)
+GetWindowsInfo (SysWMInfo)
+GetX11Info (SysWMInfo)
+GetYUVConversionMode
+GetYUVConversionModeForResolution
+HapticIndex
+HapticName
+HapticOpen
+HapticOpenFromJoystick
+HapticOpenFromMouse
+HapticOpened
+Has3DNow
+HasAVX
+HasAVX2
+HasAltiVec
+HasClipboardText
+HasEvent
+HasEvents
+HasIntersection (Rect)
+HasMMX
+HasNEON
+HasRDTSC
+HasSSE
+HasSSE2
+HasSSE3
+HasSSE41
+HasSSE42
+HasScreenKeyboardSupport
+Hat (GameControllerButtonBind)
+Hat (Joystick)
+HatMask (GameControllerButtonBind)
+Hide (Window)
+InRect (Point)
+	Init
+InitSubSystem
+InstanceID (Joystick)
+Intersect (Rect)
+IntersectLine (Rect)
+IsBigEndian (AudioFormat)
+IsFloat (AudioFormat)
+IsGameController
+IsInt (AudioFormat)
+IsLittleEndian (AudioFormat)
+IsScreenKeyboardShown
+IsScreenSaverEnabled
+IsSigned (AudioFormat)
+IsTextInputActive
+IsUnsigned (AudioFormat)
+Joystick (GameController)
+JoystickEventState
+JoystickFromInstanceID
+JoystickGetDeviceGUID
+JoystickGetDeviceInstanceID
+JoystickGetDeviceProduct
+JoystickGetDeviceProductVersion
+JoystickGetDeviceType
+JoystickGetDeviceVendor
+JoystickGetGUIDFromString
+JoystickGetGUIDString
+JoystickIsHaptic
+JoystickNameForIndex
+JoystickOpen
+JoystickUpdate
+LoadBMP
+LoadBMPRW
+LoadDLL
+LoadDollarTemplates
+LoadFile
+LoadFileRW (RWops)
+LoadFunction (SharedObject)
+LoadObject
+LoadWAV
+LoadWAVRW
+Lock (Mutex)
+Lock (Surface)
+Lock (Texture)
+LockAudio
+LockAudioDevice
+LockJoysticks
+	Log
+	LogCritical
+	LogDebug
+	LogError
+	LogGetOutputFunction
+	LogGetPriority
+	LogInfo
+	LogMessage
+	LogResetPriorities
+	LogSetAllPriority
+	LogSetOutputFunction
+	LogSetPriority
+	LogVerbose
+	LogWarn
+LowerBlit (Surface)
+LowerBlitScaled (Surface)
+	Main
+MapRGB
+MapRGBA
+Mapping (GameController)
+MasksToPixelFormatEnum
+Maximize (Window)
+Minimize (Window)
+MixAudio
+MixAudioFormat
+MouseIsHaptic
+MustLock (Surface)
+Name (GameController)
+Name (Joystick)
+NewAudioStream
+NewEffect (Haptic)
+NumAxes (Haptic)
+NumAxes (Joystick)
+NumBalls (Joystick)
+NumButtons (Joystick)
+NumEffects (Haptic)
+NumEffectsPlaying (Haptic)
+NumHaptics
+NumHats (Joystick)
+NumJoysticks
+NumSensors
+OpenAudio
+OpenAudioDevice
+OutOfMemory
+Pause (Haptic)
+PauseAudio
+PauseAudioDevice
+PeepEvents
+PixelFormatEnumToMasks
+PixelNum (Surface)
+Pixels (Surface)
+PollEvent
+Post (Sem)
+Present (Renderer)
+Product (GameController)
+Product (Joystick)
+ProductVersion (GameController)
+ProductVersion (Joystick)
+PumpEvents
+	PushEvent
+Put (AudioStream)
+Query (Haptic)
+Query (Texture)
+QueueAudio
+	Quit
+QuitSubSystem
+	RWFromFile
+	RWFromMem
+Raise (Window)
+	Read (RWops)
+	Read2 (RWops)
+	ReadBE16 (RWops)
+	ReadBE32 (RWops)
+	ReadBE64 (RWops)
+	ReadLE16 (RWops)
+	ReadLE32 (RWops)
+	ReadLE64 (RWops)
+ReadPixels (Renderer)
+	ReadU8 (RWops)
+RecordGesture
+RegisterEvents
+RenderTargetSupported (Renderer)
+Restore (Window)
+RumbleInit (Haptic)
+RumblePlay (Haptic)
+RumbleStop (Haptic)
+RumbleSupported (Haptic)
+RunEffect (Haptic)
+SaveAllDollarTemplates
+SaveBMP (Surface)
+SaveBMPRW (Surface)
+SaveDollarTemplate
+	Seek (RWops)
+SensorFromInstanceID
+SensorGetDeviceInstanceID
+SensorGetDeviceName
+SensorGetDeviceNonPortableType
+SensorGetDeviceType
+SensorOpen
+SensorUpdate
+Set (Surface)
+SetAlphaMod (Surface)
+SetAlphaMod (Texture)
+SetAutocenter (Haptic)
+SetBlendMode (Surface)
+SetBlendMode (Texture)
+SetBordered (Window)
+SetBrightness (Window)
+SetClipRect (Renderer)
+SetClipRect (Surface)
+SetClipboardText
+SetColorKey (Surface)
+SetColorMod (Surface)
+SetColorMod (Texture)
+SetColors (Palette)
+SetCursor
+SetData (Window)
+SetDisplayMode (Window)
+SetDrawBlendMode (Renderer)
+SetDrawColor (Renderer)
+SetDrawColorArray (Renderer)
+SetError
+SetEventFilter
+SetEventFilterFunc
+SetFullscreen (Window)
+SetGain (Haptic)
+SetGammaRamp (Window)
+SetGrab (Window)
+SetHint
+SetHintWithPriority
+SetIcon (Window)
+SetLogicalSize (Renderer)
+SetMaximumSize (Window)
+SetMinimumSize (Window)
+SetModState
+SetPalette (PixelFormat)
+SetPalette (Surface)
+SetPosition (Window)
+SetRLE (Surface)
+SetRelativeMouseMode
+SetRenderTarget (Renderer)
+SetResizable (Window)
+SetScale (Renderer)
+SetSize (Window)
+SetTextInputRect
+SetTitle (Window)
+SetViewport (Renderer)
+SetWindowOpacity (Window)
+SetYUVConversionMode
+Show (Window)
+ShowCursor
+ShowMessageBox
+ShowSimpleMessageBox
+Signal (Cond)
+	Size (RWops)
+SoftStretch (Surface)
+StartTextInput
+StopAll (Haptic)
+StopEffect (Haptic)
+StopTextInput
+	Tell (RWops)
+TryLock (Mutex)
+TryWait (Sem)
+Type (GameControllerButtonBind)
+Type (Joystick)
+Uint32 (Color)
+Union (Rect)
+Unload (SharedObject)
+Unlock (Mutex)
+Unlock (Surface)
+Unlock (Texture)
+UnlockAudio
+UnlockAudioDevice
+UnlockJoysticks
+Unpause (Haptic)
+Unsupported
+Update (Texture)
+UpdateEffect (Haptic)
+UpdateRGBA (Texture)
+UpdateSurface (Window)
+UpdateSurfaceRects (Window)
+UpdateYUV (Texture)
+UpperBlit (Surface)
+UpperBlitScaled (Surface)
+VERSION
+VERSIONNUM
+VERSION_ATLEAST
+Value (Sem)
+Vendor (GameController)
+Vendor (Joystick)
+VideoInit
+VideoQuit
+VulkanCreateSurface (Window)
+VulkanGetDrawableSize (Window)
+VulkanGetInstanceExtensions (Window)
+VulkanGetVkGetInstanceProcAddr
+VulkanLoadLibrary
+VulkanUnloadLibrary
+Wait (Cond)
+Wait (Sem)
+WaitEvent
+WaitEventTimeout
+WaitTimeout (Cond)
+WaitTimeout (Sem)
+WarpMouseGlobal
+WarpMouseInWindow (Window)
+WasInit
+	Write (RWops)
+	Write2 (RWops)
+	WriteBE16 (RWops)
+	WriteBE32 (RWops)
+	WriteBE64 (RWops)
+	WriteLE16 (RWops)
+	WriteLE32 (RWops)
+	WriteLE64 (RWops)
+	WriteU8 (RWops)
