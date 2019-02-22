@@ -3567,38 +3567,29 @@ func LogSetAllPriority(p LogPriority) {
 // LogSetOutputFunction replaces the default log output function with one of your own.
 // (https://wiki.libsdl.org/SDL_LogSetOutputFunction)
 func LogSetOutputFunction(f LogOutputFunction, data interface{}) {
-	ctx := &logOutputFunctionCtx{
-		f: f,
-		d: data,
-	}
+	logCtx.f = f
+	logCtx.data = data
 	logSetOutputFunction.Call(
 		logOutputFunctionPtr,
-		uintptr(unsafe.Pointer(&ctx)),
+		uintptr(unsafe.Pointer(&logCtx)),
 	)
-	logOutputFunctionCache = f
-	logOutputDataCache = data
 }
 
 // Yissakhar Z. Beck (DeedleFake)'s implementation
-//
-//export logOutputFunction
 func theLogOutputFunction(data uintptr, category int, pri LogPriority, message uintptr) uintptr {
 	ctx := (*logOutputFunctionCtx)(unsafe.Pointer(data))
-	ctx.f(ctx.d, category, pri, sdlToGoString(message))
+	ctx.f(ctx.data, category, pri, sdlToGoString(message))
 	return 0
 }
 
 var logOutputFunctionPtr = syscall.NewCallback(theLogOutputFunction)
 
 type logOutputFunctionCtx struct {
-	f LogOutputFunction
-	d interface{}
+	f    LogOutputFunction
+	data interface{}
 }
 
-var (
-	logOutputFunctionCache LogOutputFunction
-	logOutputDataCache     interface{}
-)
+var logCtx logOutputFunctionCtx
 
 // LogSetPriority sets the priority of a particular log category.
 // (https://wiki.libsdl.org/SDL_LogSetPriority)
@@ -3886,10 +3877,15 @@ func QueueAudio(dev AudioDeviceID, data []byte) error {
 func Quit() {
 	quit.Call()
 
-	eventFilterCache = nil
-	for k := range eventWatches {
-		delete(eventWatches, k)
+	hintCallbacks = make(map[string]HintCallbackAndData)
+	callInMain = func(f func()) {
+		panic("sdl.Main(main func()) must be called before sdl.Do(f func())")
 	}
+	logCtx.f = nil
+	logCtx.data = nil
+	eventFilterCache = nil
+	eventWatches = make(map[EventWatchHandle]*eventFilterCallbackContext)
+	lastEventWatchHandle = 0
 }
 
 // QuitSubSystem shuts down specific SDL subsystems.
@@ -6088,7 +6084,7 @@ type LogOutputFunction func(data interface{}, category int, pri LogPriority, mes
 // LogGetOutputFunction returns the current log output function.
 // (https://wiki.libsdl.org/SDL_LogGetOutputFunction)
 func LogGetOutputFunction() (LogOutputFunction, interface{}) {
-	return logOutputFunctionCache, logOutputDataCache
+	return logCtx.f, logCtx.data
 }
 
 // LogPriority is a predefined log priority.
@@ -6480,8 +6476,17 @@ func RWFromMem(mem []byte) (*RWops, error) {
 // Close closes and frees the allocated RWops structure.
 // (https://wiki.libsdl.org/SDL_RWclose)
 func (rwops *RWops) Close() error {
-	ret, _, _ := rwClose.Call(uintptr(unsafe.Pointer(rwops)))
-	if rwops != nil && ret != 0 {
+	if rwops == nil {
+		return ErrInvalidParameters
+	}
+	ret, _, _ := syscall.Syscall(
+		rwops.close,
+		1,
+		uintptr(unsafe.Pointer(rwops)),
+		0,
+		0,
+	)
+	if ret != 0 {
 		return GetError()
 	}
 	return nil
