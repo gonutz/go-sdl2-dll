@@ -1397,6 +1397,15 @@ const SDL_STANDARD_GRAVITY = 9.80665
 
 const TEXTINPUTEVENT_TEXT_SIZE = 32
 
+const (
+	MESSAGEBOX_COLOR_BACKGROUND = iota
+	MESSAGEBOX_COLOR_TEXT
+	MESSAGEBOX_COLOR_BUTTON_BORDER
+	MESSAGEBOX_COLOR_BUTTON_BACKGROUND
+	MESSAGEBOX_COLOR_BUTTON_SELECTED
+	MESSAGEBOX_COLOR_MAX
+)
+
 var ErrInvalidParameters = errors.New("Invalid Parameters")
 
 var (
@@ -4079,45 +4088,52 @@ func ShowCursor(toggle int) (int, error) {
 
 // ShowMessageBox creates a modal message box.
 // (https://wiki.libsdl.org/SDL_ShowMessageBox)
-func ShowMessageBox(data *MessageBoxData) (buttonid int32, err error) {
-	// TODO
-	//_title := C.CString(data.Title)
-	//defer C.free(unsafe.Pointer(_title))
-	//_message := C.CString(data.Message)
-	//defer C.free(unsafe.Pointer(_message))
-	//
-	//var cbuttons []C.SDL_MessageBoxButtonData
-	//var cbtntexts []*C.char
-	//defer func(texts []*C.char) {
-	//	for _, t := range texts {
-	//		C.free(unsafe.Pointer(t))
-	//	}
-	//}(cbtntexts)
-	//
-	//for _, btn := range data.Buttons {
-	//	ctext := C.CString(btn.Text)
-	//	cbtn := C.SDL_MessageBoxButtonData{
-	//		flags:    C.Uint32(btn.Flags),
-	//		buttonid: C.int(btn.ButtonID),
-	//		text:     ctext,
-	//	}
-	//
-	//	cbuttons = append(cbuttons, cbtn)
-	//	cbtntexts = append(cbtntexts, ctext)
-	//}
-	//
-	//cdata := C.SDL_MessageBoxData{
-	//	flags:       C.Uint32(data.Flags),
-	//	window:      data.Window.cptr(),
-	//	title:       _title,
-	//	message:     _message,
-	//	numbuttons:  C.int(data.NumButtons),
-	//	buttons:     &cbuttons[0],
-	//	colorScheme: data.ColorScheme.cptr(),
-	//}
-	//
-	//buttonid = int32(C.ShowMessageBox(cdata))
-	//return buttonid, errorFromInt(int(buttonid))
+func ShowMessageBox(data *MessageBoxData) (buttonid int, err error) {
+	type buttonData struct {
+		flags uint32
+		id    int32
+		text  uintptr
+	}
+	type colorScheme struct {
+		colors [MESSAGEBOX_COLOR_MAX]MessageBoxColor
+	}
+	type boxData struct {
+		flags       uint32
+		window      *Window
+		title       uintptr
+		message     uintptr
+		buttonCount int32
+		buttons     *buttonData
+		scheme      *MessageBoxColorScheme
+	}
+	var cData boxData
+	cData.flags = data.Flags
+	cData.window = data.Window
+	t := append([]byte(data.Title), 0)
+	cData.title = uintptr(unsafe.Pointer(&t[0]))
+	m := append([]byte(data.Message), 0)
+	cData.message = uintptr(unsafe.Pointer(&m[0]))
+	cData.buttonCount = int32(len(data.Buttons))
+	buttons := make([]buttonData, len(data.Buttons))
+	texts := make([][]byte, len(data.Buttons))
+	for i := range data.Buttons {
+		buttons[i].flags = data.Buttons[i].Flags
+		buttons[i].id = data.Buttons[i].ButtonID
+		texts[i] = append([]byte(data.Buttons[i].Text), 0)
+		buttons[i].text = uintptr(unsafe.Pointer(&texts[i][0]))
+	}
+	if len(buttons) > 0 {
+		cData.buttons = &buttons[0]
+	}
+	cData.scheme = data.ColorScheme
+
+	ret, _, _ := showMessageBox.Call(
+		uintptr(unsafe.Pointer(&cData)),
+		uintptr(unsafe.Pointer(&buttonid)),
+	)
+	if ret != 0 {
+		err = GetError()
+	}
 	return
 }
 
@@ -6117,19 +6133,18 @@ type MessageBoxColor struct {
 // MessageBoxColorScheme contains a set of colors to use for message box dialogs.
 // (https://wiki.libsdl.org/SDL_MessageBoxColorScheme)
 type MessageBoxColorScheme struct {
-	Colors [5]MessageBoxColor // background, text, button border, button background, button selected
+	Colors [MESSAGEBOX_COLOR_MAX]MessageBoxColor // background, text, button border, button background, button selected
 }
 
 // MessageBoxData contains title, text, window and other data for a message box.
 // (https://wiki.libsdl.org/SDL_MessageBoxData)
 type MessageBoxData struct {
-	Flags       uint32                 // MESSAGEBOX_ERROR, MESSAGEBOX_WARNING, MESSAGEBOX_INFORMATION
-	Window      *Window                // an parent window, can be nil
-	Title       string                 // an UTF-8 title
-	Message     string                 // an UTF-8 message text
-	NumButtons  int32                  // the number of buttons
-	Buttons     []MessageBoxButtonData // an array of MessageBoxButtonData with size of numbuttons
-	ColorScheme *MessageBoxColorScheme // a MessageBoxColorScheme, can be nil to use system settings
+	Flags       uint32  // MESSAGEBOX_ERROR, MESSAGEBOX_WARNING, MESSAGEBOX_INFORMATION
+	Window      *Window // parent window or nil
+	Title       string
+	Message     string
+	Buttons     []MessageBoxButtonData
+	ColorScheme *MessageBoxColorScheme // nil to use system settings
 }
 
 // MouseButtonEvent contains mouse button event information.
