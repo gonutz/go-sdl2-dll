@@ -3869,6 +3869,7 @@ func QuitSubSystem(flags uint32) {
 // RecordGesture begins recording a gesture on a specified touch device or all touch devices.
 // (https://wiki.libsdl.org/SDL_RecordGesture)
 func RecordGesture(t TouchID) int {
+	// TODO t is 64 bit
 	ret, _, _ := recordGesture.Call(uintptr(t))
 	return int(ret)
 }
@@ -3890,6 +3891,7 @@ func SaveAllDollarTemplates(src *RWops) int {
 // SaveDollarTemplate saves a currently loaded Dollar Gesture template.
 // (https://wiki.libsdl.org/SDL_SaveDollarTemplate)
 func SaveDollarTemplate(g GestureID, src *RWops) int {
+	// TODO g is 64 bit
 	ret, _, _ := saveDollarTemplate.Call(uintptr(g), uintptr(unsafe.Pointer(src)))
 	return int(ret)
 }
@@ -5102,6 +5104,7 @@ type Finger struct {
 // GetTouchFinger returns the finger object for specified touch device ID and finger index.
 // (https://wiki.libsdl.org/SDL_GetTouchFinger)
 func GetTouchFinger(t TouchID, index int) *Finger {
+	// TODO t is 64 bit
 	ret, _, _ := getTouchFinger.Call(uintptr(t), uintptr(index))
 	return (*Finger)(unsafe.Pointer(ret))
 }
@@ -8703,6 +8706,7 @@ type TouchID int64
 // (https://wiki.libsdl.org/SDL_GetTouchDevice)
 func GetTouchDevice(index int) TouchID {
 	ret, _, _ := getTouchDevice.Call(uintptr(index))
+	// TODO TouchID is 64 bit
 	return TouchID(ret)
 }
 
