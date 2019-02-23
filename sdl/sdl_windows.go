@@ -1526,6 +1526,7 @@ var (
 	joystickGetDeviceProduct          = dll.NewProc("SDL_JoystickGetDeviceProduct")
 	joystickGetDeviceProductVersion   = dll.NewProc("SDL_JoystickGetDeviceProductVersion")
 	joystickGetDeviceVendor           = dll.NewProc("SDL_JoystickGetDeviceVendor")
+	joystickGetGUIDString             = dll.NewProc("SDL_JoystickGetGUIDString")
 	joystickIsHaptic                  = dll.NewProc("SDL_JoystickIsHaptic")
 	joystickNameForIndex              = dll.NewProc("SDL_JoystickNameForIndex")
 	joystickUpdate                    = dll.NewProc("SDL_JoystickUpdate")
@@ -2847,16 +2848,6 @@ func GameControllerGetStringForButton(btn GameControllerButton) string {
 	return sdlToGoString(ret)
 }
 
-// GameControllerMappingForGUID returns the game controller mapping string for a
-// given GUID.
-//(https://wiki.libsdl.org/SDL_GameControllerMappingForGUID)
-func GameControllerMappingForGUID(guid JoystickGUID) string {
-	//	mappingString := C.SDL_GameControllerMappingForGUID(guid.c())
-	//defer C.free(unsafe.Pointer(mappingString))
-	//return C.GoString(mappingString)
-	return "" // TODO
-}
-
 // GameControllerMappingForIndex returns the game controller mapping string at a
 // particular index.
 func GameControllerMappingForIndex(index int) string {
@@ -3059,14 +3050,6 @@ func GetNumRenderDrivers() (int, error) {
 // (https://wiki.libsdl.org/SDL_GetNumTouchDevices)
 func GetNumTouchDevices() int {
 	ret, _, _ := getNumTouchDevices.Call()
-	return int(ret)
-}
-
-// GetNumTouchFingers returns the number of active fingers for a given touch device.
-// (https://wiki.libsdl.org/SDL_GetNumTouchFingers)
-func GetNumTouchFingers(t TouchID) int {
-	// TODO TouchID is an int64, this will probably not work on a 32 bit OS
-	ret, _, _ := getNumTouchFingers.Call(uintptr(t))
 	return int(ret)
 }
 
@@ -3455,17 +3438,6 @@ func JoystickGetDeviceVendor(index int) int {
 	return int(ret)
 }
 
-// JoystickGetGUIDString returns an ASCII string representation for a given JoystickGUID.
-// (https://wiki.libsdl.org/SDL_JoystickGetGUIDString)
-func JoystickGetGUIDString(guid JoystickGUID) string {
-	return "" // TODO
-	//_pszGUID := make([]rune, 1024)
-	//pszGUID := C.CString(string(_pszGUID[:]))
-	//defer C.free(unsafe.Pointer(pszGUID))
-	//C.SDL_JoystickGetGUIDString(guid.c(), pszGUID, C.int(unsafe.Sizeof(_pszGUID)))
-	//return C.GoString(pszGUID)
-}
-
 // JoystickIsHaptic reports whether a joystick has haptic features.
 // (https://wiki.libsdl.org/SDL_JoystickIsHaptic)
 func JoystickIsHaptic(joy *Joystick) (bool, error) {
@@ -3484,17 +3456,6 @@ func JoystickNameForIndex(index int) string {
 // (https://wiki.libsdl.org/SDL_JoystickUpdate)
 func JoystickUpdate() {
 	joystickUpdate.Call()
-}
-
-// LoadDollarTemplates loads Dollar Gesture templates from a file.
-// (https://wiki.libsdl.org/SDL_LoadDollarTemplates)
-func LoadDollarTemplates(t TouchID, src *RWops) int {
-	// TODO passing int64 as uintptr, does it work on 32 bit OS?
-	ret, _, _ := loadDollarTemplates.Call(
-		uintptr(t),
-		uintptr(unsafe.Pointer(src)),
-	)
-	return int(ret)
 }
 
 // LoadFile loads an entire file
@@ -6575,16 +6536,6 @@ func (rwops *RWops) ReadBE32() uint32 {
 	return uint32(ret)
 }
 
-// ReadBE64 reads 64 bits of big-endian data from the RWops and returns in native format.
-// (https://wiki.libsdl.org/SDL_ReadBE64)
-func (rwops *RWops) ReadBE64() uint64 {
-	if rwops == nil {
-		return 0
-	}
-	ret, _, _ := readBE64.Call(uintptr(unsafe.Pointer(rwops)))
-	return uint64(ret)
-}
-
 // ReadLE16 reads 16 bits of little-endian data from the RWops and returns in native format.
 // (https://wiki.libsdl.org/SDL_ReadLE16)
 func (rwops *RWops) ReadLE16() uint16 {
@@ -6605,16 +6556,6 @@ func (rwops *RWops) ReadLE32() uint32 {
 	return uint32(ret)
 }
 
-// ReadLE64 reads 64 bits of little-endian data from the RWops and returns in native format.
-// (https://wiki.libsdl.org/SDL_ReadLE64)
-func (rwops *RWops) ReadLE64() uint64 {
-	if rwops == nil {
-		return 0
-	}
-	ret, _, _ := readLE64.Call(uintptr(unsafe.Pointer(rwops)))
-	return uint64(ret)
-}
-
 // ReadU8 reads a byte from the RWops.
 // (https://wiki.libsdl.org/SDL_ReadU8)
 func (rwops *RWops) ReadU8() uint8 {
@@ -6625,60 +6566,10 @@ func (rwops *RWops) ReadU8() uint8 {
 	return uint8(ret)
 }
 
-// Seek seeks within the RWops data stream.
-// (https://wiki.libsdl.org/SDL_RWseek)
-func (rwops *RWops) Seek(offset int64, whence int) (int64, error) {
-	if rwops == nil {
-		return -1, ErrInvalidParameters
-	}
-	ret, _, _ := syscall.Syscall(
-		rwops.seek,
-		3,
-		uintptr(unsafe.Pointer(rwops)),
-		uintptr(offset), // TODO what about 32 bit systems? a uintptr is only 32 bytes there
-		uintptr(whence),
-	)
-	if ret < 0 {
-		return int64(ret), GetError()
-	}
-	return int64(ret), nil
-}
-
-// Size returns the size of the data stream in the RWops.
-// (https://wiki.libsdl.org/SDL_RWsize)
-func (rwops *RWops) Size() (int64, error) {
-	ret, _, _ := syscall.Syscall(
-		rwops.size,
-		1,
-		uintptr(unsafe.Pointer(rwops)),
-		0,
-		0,
-	)
-	n := int64(ret)
-	if n < 0 {
-		return n, GetError()
-	}
-	return n, nil
-}
-
 // Tell returns the current read/write offset in the RWops data stream.
 // (https://wiki.libsdl.org/SDL_RWtell)
 func (rwops *RWops) Tell() (int64, error) {
-	if rwops == nil {
-		return 0, ErrInvalidParameters
-	}
-	ret, _, _ := syscall.Syscall(
-		rwops.seek,
-		3,
-		uintptr(unsafe.Pointer(rwops)),
-		0,
-		uintptr(RW_SEEK_CUR),
-	)
-	ofs := int64(ret)
-	if ofs < 0 {
-		return ofs, GetError()
-	}
-	return ofs, nil
+	return rwops.Seek(0, RW_SEEK_CUR)
 }
 
 // Write writes to the RWops data stream.
@@ -7213,7 +7104,7 @@ func (renderer *Renderer) CopyEx(texture *Texture, src, dst *Rect, angle float64
 		uintptr(unsafe.Pointer(texture)),
 		uintptr(unsafe.Pointer(src)),
 		uintptr(unsafe.Pointer(dst)),
-		uintptr(angle),
+		uintptr(angle), // TODO this is 64 bit, what on 32 bit OS?
 		uintptr(unsafe.Pointer(center)),
 		uintptr(flip),
 	)

@@ -11,6 +11,13 @@ import (
 	"github.com/gonutz/go-sdl2/sdl"
 )
 
+func TestMain(m *testing.M) {
+	if len(os.Args) > 1 {
+		sdl.LoadDLL(os.Args[1])
+	}
+	os.Exit(m.Run())
+}
+
 func test(f func()) {
 	sdl.Main(func() {
 		sdl.Do(f)
@@ -207,8 +214,8 @@ func TestRWReadWrite(t *testing.T) {
 	check.Eq(t, rw.ReadLE16(), 0x04+0x05<<8)
 	check.Eq(t, rw.ReadBE32(), 0x06+0x07<<8+0x08<<16+0x09<<24)
 	check.Eq(t, rw.ReadLE32(), 0x0A+0x0B<<8+0x0C<<16+0x0D<<24)
-	check.Eq(t, rw.ReadBE64(), 0x0E+0x0F<<8+0x10<<16+0x11<<24+0x12<<32+0x13<<40+0x14<<48+0x15<<56)
-	check.Eq(t, rw.ReadLE64(), 0x16+0x17<<8+0x18<<16+0x19<<24+0x1A<<32+0x1B<<40+0x1C<<48+0x1D<<56)
+	check.Eq(t, rw.ReadBE64(), uint64(0x0E+0x0F<<8+0x10<<16+0x11<<24+0x12<<32+0x13<<40+0x14<<48+0x15<<56))
+	check.Eq(t, rw.ReadLE64(), uint64(0x16+0x17<<8+0x18<<16+0x19<<24+0x1A<<32+0x1B<<40+0x1C<<48+0x1D<<56))
 
 	var readBuf [3]byte
 	n, err = rw.Read(readBuf[:])
