@@ -106,7 +106,6 @@ func TestAddAndDeleteHintCallback(t *testing.T) {
 		)
 		// NOTE that the first time we add a hint callback, it is immediately
 		// called with the old and new value being the same
-		// TODO fails on 32 bit
 		sdl.SetHint(sdl.HINT_RENDER_SCALE_QUALITY, "1") // change "" -> "1"
 		sdl.SetHint(sdl.HINT_RENDER_DRIVER, "1")        // should not trigger
 		check.Eq(t, x, []interface{}{
@@ -244,7 +243,7 @@ func TestLog(t *testing.T) {
 	haveF, haveData := sdl.LogGetOutputFunction()
 	check.Eq(t, haveF, sdl.LogOutputFunction(f))
 	check.Eq(t, haveData, "test")
-	sdl.Log("%d", 123) // TODO this fails the 32 bit version
+	sdl.Log("%d", 123)
 	check.Eq(t, x, []interface{}{
 		"test",
 		sdl.LOG_CATEGORY_APPLICATION,

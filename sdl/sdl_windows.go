@@ -2402,7 +2402,7 @@ func theHintCallback(userdata, name, oldValue, newValue uintptr) uintptr {
 	return 0
 }
 
-var hintCallbackPtr = syscall.NewCallback(theHintCallback)
+var hintCallbackPtr = syscall.NewCallbackCDecl(theHintCallback)
 
 // AddHintCallback adds a function to watch a particular hint.
 // (https://wiki.libsdl.org/SDL_AddHintCallback)
@@ -3554,7 +3554,7 @@ func theLogOutputFunction(data uintptr, category int, pri LogPriority, message u
 	return 0
 }
 
-var logOutputFunctionPtr = syscall.NewCallback(theLogOutputFunction)
+var logOutputFunctionPtr = syscall.NewCallbackCDecl(theLogOutputFunction)
 
 type logOutputFunctionCtx struct {
 	f    LogOutputFunction
@@ -3986,7 +3986,7 @@ func theSetEventFilterCallback(data, event uintptr) uintptr {
 	return wrapEventFilterCallback(eventFilterCache, event, nil)
 }
 
-var setEventFilterCallbackPtr = syscall.NewCallback(theSetEventFilterCallback)
+var setEventFilterCallbackPtr = syscall.NewCallbackCDecl(theSetEventFilterCallback)
 
 // SetEventFilterFunc sets up a function to process all events before they change internal state and are posted to the internal event queue.
 // (https://wiki.libsdl.org/SDL_SetEventFilter)
@@ -5038,15 +5038,11 @@ func AddEventWatch(filter EventFilter, userdata interface{}) EventWatchHandle {
 }
 
 func theEventFilterCallback(userdata, event uintptr) uintptr {
-	// same sort of reasoning with goSetEventFilterCallback, userdata should
-	// always be non-nil and represent a valid eventFilterCallbackContext. If
-	// it doesn't a panic will let us know that there something wrong and the
-	// problem can be fixed.
 	context := eventWatches[EventWatchHandle(userdata)]
 	return wrapEventFilterCallback(context.filter, event, context.userdata)
 }
 
-var eventFilterCallbackPtr = syscall.NewCallback(theEventFilterCallback)
+var eventFilterCallbackPtr = syscall.NewCallbackCDecl(theEventFilterCallback)
 
 func wrapEventFilterCallback(filter EventFilter, e uintptr, userdata interface{}) uintptr {
 	gev := goEvent((*CEvent)(unsafe.Pointer(e)))
