@@ -13,7 +13,9 @@ import (
 
 func TestMain(m *testing.M) {
 	if len(os.Args) > 1 {
-		sdl.LoadDLL(os.Args[1])
+		if err := sdl.LoadDLL(os.Args[1]); err != nil {
+			panic(err)
+		}
 	}
 	os.Exit(m.Run())
 }
@@ -242,7 +244,6 @@ func TestLog(t *testing.T) {
 	haveF, haveData := sdl.LogGetOutputFunction()
 	check.Eq(t, haveF, sdl.LogOutputFunction(f))
 	check.Eq(t, haveData, "test")
-
 	sdl.Log("%d", 123) // TODO this fails the 32 bit version
 	check.Eq(t, x, []interface{}{
 		"test",
