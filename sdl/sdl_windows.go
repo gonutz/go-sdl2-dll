@@ -3867,14 +3867,6 @@ func QuitSubSystem(flags uint32) {
 	quitSubSystem.Call(uintptr(flags))
 }
 
-// RecordGesture begins recording a gesture on a specified touch device or all touch devices.
-// (https://wiki.libsdl.org/SDL_RecordGesture)
-func RecordGesture(t TouchID) int {
-	// TODO t is 64 bit
-	ret, _, _ := recordGesture.Call(uintptr(t))
-	return int(ret)
-}
-
 // RegisterEvents allocates a set of user-defined events, and return the beginning event number for that set of events.
 // (https://wiki.libsdl.org/SDL_RegisterEvents)
 func RegisterEvents(numEvents int) uint32 {
@@ -3886,14 +3878,6 @@ func RegisterEvents(numEvents int) uint32 {
 // (https://wiki.libsdl.org/SDL_SaveAllDollarTemplates)
 func SaveAllDollarTemplates(src *RWops) int {
 	ret, _, _ := saveAllDollarTemplates.Call(uintptr(unsafe.Pointer(src)))
-	return int(ret)
-}
-
-// SaveDollarTemplate saves a currently loaded Dollar Gesture template.
-// (https://wiki.libsdl.org/SDL_SaveDollarTemplate)
-func SaveDollarTemplate(g GestureID, src *RWops) int {
-	// TODO g is 64 bit
-	ret, _, _ := saveDollarTemplate.Call(uintptr(g), uintptr(unsafe.Pointer(src)))
 	return int(ret)
 }
 
@@ -5096,14 +5080,6 @@ type Finger struct {
 	X        float32  // the x-axis location of the touch event, normalized (0...1)
 	Y        float32  // the y-axis location of the touch event, normalized (0...1)
 	Pressure float32  // the quantity of pressure applied, normalized (0...1)
-}
-
-// GetTouchFinger returns the finger object for specified touch device ID and finger index.
-// (https://wiki.libsdl.org/SDL_GetTouchFinger)
-func GetTouchFinger(t TouchID, index int) *Finger {
-	// TODO t is 64 bit
-	ret, _, _ := getTouchFinger.Call(uintptr(t), uintptr(index))
-	return (*Finger)(unsafe.Pointer(ret))
 }
 
 // FingerID is a finger id.
@@ -8683,14 +8659,6 @@ func (e *TouchFingerEvent) GetType() uint32 {
 
 // TouchID is the ID of a touch device.
 type TouchID int64
-
-// GetTouchDevice returns the touch ID with the given index.
-// (https://wiki.libsdl.org/SDL_GetTouchDevice)
-func GetTouchDevice(index int) TouchID {
-	ret, _, _ := getTouchDevice.Call(uintptr(index))
-	// TODO TouchID is 64 bit
-	return TouchID(ret)
-}
 
 // UIKitInfo contains Apple iOS window information.
 type UIKitInfo struct {

@@ -156,3 +156,31 @@ func (renderer *Renderer) CopyEx(texture *Texture, src, dst *Rect, angle float64
 	)
 	return errorFromInt(int(ret))
 }
+
+// RecordGesture begins recording a gesture on a specified touch device or all touch devices.
+// (https://wiki.libsdl.org/SDL_RecordGesture)
+func RecordGesture(t TouchID) int {
+	ret, _, _ := recordGesture.Call(uintptr(t))
+	return int(ret)
+}
+
+// GetTouchDevice returns the touch ID with the given index.
+// (https://wiki.libsdl.org/SDL_GetTouchDevice)
+func GetTouchDevice(index int) TouchID {
+	ret, _, _ := getTouchDevice.Call(uintptr(index))
+	return TouchID(ret)
+}
+
+// SaveDollarTemplate saves a currently loaded Dollar Gesture template.
+// (https://wiki.libsdl.org/SDL_SaveDollarTemplate)
+func SaveDollarTemplate(g GestureID, src *RWops) int {
+	ret, _, _ := saveDollarTemplate.Call(uintptr(g), uintptr(unsafe.Pointer(src)))
+	return int(ret)
+}
+
+// GetTouchFinger returns the finger object for specified touch device ID and finger index.
+// (https://wiki.libsdl.org/SDL_GetTouchFinger)
+func GetTouchFinger(t TouchID, index int) *Finger {
+	ret, _, _ := getTouchFinger.Call(uintptr(t), uintptr(index))
+	return (*Finger)(unsafe.Pointer(ret))
+}
