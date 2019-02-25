@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"math"
 	"reflect"
 	"runtime"
 	"sync"
@@ -2513,7 +2514,7 @@ func COMPILEDVERSION() int {
 // (https://wiki.libsdl.org/SDL_CalculateGammaRamp)
 func CalculateGammaRamp(gamma float32, ramp *[256]uint16) {
 	calculateGammaRamp.Call(
-		uintptr(gamma),
+		uintptr(math.Float32bits(gamma)),
 		uintptr(unsafe.Pointer(ramp)),
 	)
 }
@@ -2607,7 +2608,7 @@ func CreateWindowAndRenderer(w, h int32, flags uint32) (*Window, *Renderer, erro
 		uintptr(unsafe.Pointer(&window)),
 		uintptr(unsafe.Pointer(&renderer)),
 	)
-	if ret == ^uintptr(0) {
+	if ret != 0 {
 		return nil, nil, GetError()
 	}
 	return &window, &renderer, nil
@@ -5419,7 +5420,7 @@ func (h *Haptic) RumbleInit() error {
 func (h *Haptic) RumblePlay(strength float32, length uint32) error {
 	ret, _, _ := hapticRumblePlay.Call(
 		uintptr(unsafe.Pointer(h)),
-		uintptr(strength),
+		uintptr(math.Float32bits(strength)),
 		uintptr(length),
 	)
 	return errorFromInt(int(ret))
@@ -7103,7 +7104,7 @@ func (renderer *Renderer) CopyEx(texture *Texture, src, dst *Rect, angle float64
 		uintptr(unsafe.Pointer(texture)),
 		uintptr(unsafe.Pointer(src)),
 		uintptr(unsafe.Pointer(dst)),
-		uintptr(angle), // TODO this is 64 bit, what on 32 bit OS?
+		uintptr(math.Float64bits(angle)), // TODO this is 64 bit, what on 32 bit OS?
 		uintptr(unsafe.Pointer(center)),
 		uintptr(flip),
 	)
@@ -7467,8 +7468,8 @@ func (renderer *Renderer) SetRenderTarget(texture *Texture) error {
 func (renderer *Renderer) SetScale(scaleX, scaleY float32) error {
 	ret, _, _ := renderSetScale.Call(
 		uintptr(unsafe.Pointer(renderer)),
-		uintptr(scaleX),
-		uintptr(scaleY),
+		uintptr(math.Float32bits(scaleX)),
+		uintptr(math.Float32bits(scaleY)),
 	)
 	return errorFromInt(int(ret))
 }
@@ -8850,7 +8851,7 @@ func (window *Window) GLSwap() {
 // (https://wiki.libsdl.org/SDL_GetWindowBrightness)
 func (window *Window) GetBrightness() float32 {
 	ret, _, _ := getWindowBrightness.Call(uintptr(unsafe.Pointer(window)))
-	return float32(ret)
+	return math.Float32frombits(uint32(ret))
 }
 
 // GetData returns the data pointer associated with the window.
@@ -9069,7 +9070,7 @@ func (window *Window) SetBordered(bordered bool) {
 func (window *Window) SetBrightness(brightness float32) error {
 	ret, _, _ := setWindowBrightness.Call(
 		uintptr(unsafe.Pointer(window)),
-		uintptr(brightness),
+		uintptr(math.Float32bits(brightness)),
 	)
 	return errorFromInt(int(ret))
 }
@@ -9200,7 +9201,7 @@ func (window *Window) SetTitle(title string) {
 func (window *Window) SetWindowOpacity(opacity float32) error {
 	ret, _, _ := setWindowOpacity.Call(
 		uintptr(unsafe.Pointer(window)),
-		uintptr(opacity),
+		uintptr(math.Float32bits(opacity)),
 	)
 	return errorFromInt(int(ret))
 }
