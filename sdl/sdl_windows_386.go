@@ -3,6 +3,7 @@
 package sdl
 
 import (
+	"math"
 	"syscall"
 	"unsafe"
 )
@@ -165,4 +166,23 @@ func JoystickGetGUIDString(guid JoystickGUID) string {
 		uintptr(len(buf)),
 	)
 	return sdlToGoString(uintptr(unsafe.Pointer(&buf[0])))
+}
+
+// CopyEx copies a portion of the texture to the current rendering target, optionally rotating it by angle around the given center and also flipping it top-bottom and/or left-right.
+// (https://wiki.libsdl.org/SDL_RenderCopyEx)
+func (renderer *Renderer) CopyEx(texture *Texture, src, dst *Rect, angle float64, center *Point, flip RendererFlip) error {
+	angleBits := math.Float64bits(angle)
+	a := uint32(angleBits)
+	b := uint32(angleBits >> 32)
+	ret, _, _ := renderCopyEx.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(unsafe.Pointer(texture)),
+		uintptr(unsafe.Pointer(src)),
+		uintptr(unsafe.Pointer(dst)),
+		uintptr(a),
+		uintptr(b),
+		uintptr(unsafe.Pointer(center)),
+		uintptr(flip),
+	)
+	return errorFromInt(int(ret))
 }
