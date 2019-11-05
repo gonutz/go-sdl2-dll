@@ -2437,6 +2437,11 @@ func AudioQuit() {
 	audioQuit.Call()
 }
 
+// BitsPerPixel returns the number of bits per pixel for the given format
+func BitsPerPixel(format uint32) int {
+	return int((format >> 8) & 0xFF)
+}
+
 // Btoi returns 0 or 1 according to the value of b.
 func Btoi(b bool) int {
 	if b == true {

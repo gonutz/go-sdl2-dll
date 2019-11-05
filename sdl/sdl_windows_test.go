@@ -341,3 +341,9 @@ func TestLog(t *testing.T) {
 		"debug active again",
 	})
 }
+
+func TestBitsPerPixel(t *testing.T) {
+	check.Eq(t, sdl.BitsPerPixel(sdl.PIXELFORMAT_RGB444), 12)
+	check.Eq(t, sdl.BitsPerPixel(sdl.PIXELFORMAT_BGR555), 15)
+	check.Eq(t, sdl.BitsPerPixel(sdl.PIXELFORMAT_BGRA8888), 32)
+}
