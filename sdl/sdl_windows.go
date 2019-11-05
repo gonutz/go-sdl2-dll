@@ -2509,6 +2509,21 @@ func ButtonX2Mask() uint32 {
 	return Button(BUTTON_X2)
 }
 
+// BytesPerPixel returns the number of bytes per pixel for the given format
+func BytesPerPixel(format uint32) int {
+	pixelFlag := (format >> 28) & 0x0F
+	isFourCC := format != 0 && pixelFlag != 1
+	if isFourCC {
+		if format == PIXELFORMAT_YUY2 ||
+			format == PIXELFORMAT_UYVY ||
+			format == PIXELFORMAT_YVYU {
+			return 2
+		}
+		return 1
+	}
+	return int(format & 0xFF)
+}
+
 // COMPILEDVERSION returns the SDL version number that you compiled against.
 // (https://wiki.libsdl.org/SDL_COMPILEDVERSION)
 func COMPILEDVERSION() int {

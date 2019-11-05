@@ -347,3 +347,10 @@ func TestBitsPerPixel(t *testing.T) {
 	check.Eq(t, sdl.BitsPerPixel(sdl.PIXELFORMAT_BGR555), 15)
 	check.Eq(t, sdl.BitsPerPixel(sdl.PIXELFORMAT_BGRA8888), 32)
 }
+
+func TestBytesPerPixel(t *testing.T) {
+	check.Eq(t, sdl.BytesPerPixel(sdl.PIXELFORMAT_RGB444), 2)
+	check.Eq(t, sdl.BytesPerPixel(sdl.PIXELFORMAT_BGR555), 2)
+	check.Eq(t, sdl.BytesPerPixel(sdl.PIXELFORMAT_BGRA8888), 4)
+	check.Eq(t, sdl.BytesPerPixel(sdl.PIXELFORMAT_YUY2), 2)
+}
