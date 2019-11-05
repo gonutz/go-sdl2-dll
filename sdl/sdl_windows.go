@@ -1427,6 +1427,7 @@ var (
 	convertAudio                      = dll.NewProc("SDL_ConvertAudio")
 	convertPixels                     = dll.NewProc("SDL_ConvertPixels")
 	createWindowAndRenderer           = dll.NewProc("SDL_CreateWindowAndRenderer")
+	threadID                          = dll.NewProc("SDL_ThreadID")
 	delEventWatch                     = dll.NewProc("SDL_DelEventWatch")
 	delay                             = dll.NewProc("SDL_Delay")
 	dequeueAudio                      = dll.NewProc("SDL_DequeueAudio")
@@ -1919,6 +1920,7 @@ func LoadDLL(file string) error {
 	convertAudio = dll.NewProc("SDL_ConvertAudio")
 	convertPixels = dll.NewProc("SDL_ConvertPixels")
 	createWindowAndRenderer = dll.NewProc("SDL_CreateWindowAndRenderer")
+	threadID = dll.NewProc("SDL_ThreadID")
 	delEventWatch = dll.NewProc("SDL_DelEventWatch")
 	delay = dll.NewProc("SDL_Delay")
 	dequeueAudio = dll.NewProc("SDL_DequeueAudio")
@@ -2632,6 +2634,13 @@ func CreateWindowAndRenderer(w, h int32, flags uint32) (*Window, *Renderer, erro
 		return nil, nil, GetError()
 	}
 	return &window, &renderer, nil
+}
+
+// CurrentThreadID gets the thread identifier for the current thread.
+// (https://wiki.libsdl.org/SDL_ThreadID)
+func CurrentThreadID() uint {
+	ret, _, _ := threadID.Call()
+	return uint(ret)
 }
 
 // DelEventWatch removes an event watch callback added with AddEventWatch().
