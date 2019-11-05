@@ -1467,6 +1467,7 @@ var (
 	getDisplayDPI                     = dll.NewProc("SDL_GetDisplayDPI")
 	getDisplayName                    = dll.NewProc("SDL_GetDisplayName")
 	eventState                        = dll.NewProc("SDL_EventState")
+	getGlobalMouseState               = dll.NewProc("SDL_GetGlobalMouseState")
 	filterEvents                      = dll.NewProc("SDL_FilterEvents")
 	getHint                           = dll.NewProc("SDL_GetHint")
 	getKeyName                        = dll.NewProc("SDL_GetKeyName")
@@ -1960,6 +1961,7 @@ func LoadDLL(file string) error {
 	getDisplayDPI = dll.NewProc("SDL_GetDisplayDPI")
 	getDisplayName = dll.NewProc("SDL_GetDisplayName")
 	eventState = dll.NewProc("SDL_EventState")
+	getGlobalMouseState = dll.NewProc("SDL_GetGlobalMouseState")
 	filterEvents = dll.NewProc("SDL_FilterEvents")
 	getHint = dll.NewProc("SDL_GetHint")
 	getKeyName = dll.NewProc("SDL_GetKeyName")
@@ -3008,6 +3010,17 @@ func GetError() error {
 func GetEventState(typ uint32) uint8 {
 	ret, _, _ := eventState.Call(uintptr(typ), ^uintptr(0) /* == QUERY */)
 	return uint8(ret)
+}
+
+// GetGlobalMouseState returns the current state of the mouse.
+// (https://wiki.libsdl.org/SDL_GetGlobalMouseState)
+func GetGlobalMouseState() (x, y int32, state uint32) {
+	ret, _, _ := getGlobalMouseState.Call(
+		uintptr(unsafe.Pointer(&x)),
+		uintptr(unsafe.Pointer(&y)),
+	)
+	state = uint32(ret)
+	return
 }
 
 // GetHint returns the value of a hint.
