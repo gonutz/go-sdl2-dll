@@ -28,6 +28,13 @@ func init() {
 	runtime.LockOSThread()
 }
 
+// External storage states. See the official Android developer guide for more information.
+// (http://developer.android.com/guide/topics/data/data-storage.html)
+const (
+	ANDROID_EXTERNAL_STORAGE_READ  = 0x01
+	ANDROID_EXTERNAL_STORAGE_WRITE = 0x02
+)
+
 // Audio format masks.
 // (https://wiki.libsdl.org/SDL_AudioFormat)
 const (
@@ -305,7 +312,12 @@ const (
 // Configuration hints
 // (https://wiki.libsdl.org/CategoryHints)
 const (
-	HINT_FRAMEBUFFER_ACCELERATION                 = "SDL_FRAMEBUFFER_ACCELERATION"                 // specifies how 3D acceleration is used with Window.GetSurface()
+	HINT_ANDROID_BLOCK_ON_PAUSE                   = "SDL_ANDROID_BLOCK_ON_PAUSE"
+	HINT_EVENT_LOGGING                            = "SDL_EVENT_LOGGING"
+	HINT_FRAMEBUFFER_ACCELERATION                 = "SDL_FRAMEBUFFER_ACCELERATION" // specifies how 3D acceleration is used with Window.GetSurface()
+	HINT_GAMECONTROLLERCONFIG_FILE                = "SDL_GAMECONTROLLERCONFIG_FILE"
+	HINT_MOUSE_TOUCH_EVENTS                       = "SDL_MOUSE_TOUCH_EVENTS"
+	HINT_RENDER_BATCHING                          = "SDL_RENDER_BATCHING"
 	HINT_RENDER_DRIVER                            = "SDL_RENDER_DRIVER"                            // specifies which render driver to use
 	HINT_RENDER_OPENGL_SHADERS                    = "SDL_RENDER_OPENGL_SHADERS"                    // specifies whether the OpenGL render driver uses shaders
 	HINT_RENDER_DIRECT3D_THREADSAFE               = "SDL_RENDER_DIRECT3D_THREADSAFE"               // specifies whether the Direct3D device is initialized for thread-safe operations
@@ -1740,7 +1752,9 @@ var (
 	createSoftwareRenderer            = dll.NewProc("SDL_CreateSoftwareRenderer")
 	renderClear                       = dll.NewProc("SDL_RenderClear")
 	renderCopy                        = dll.NewProc("SDL_RenderCopy")
+	renderCopyF                       = dll.NewProc("SDL_RenderCopyF")
 	renderCopyEx                      = dll.NewProc("SDL_RenderCopyEx")
+	renderCopyExF                     = dll.NewProc("SDL_RenderCopyExF")
 	createTexture                     = dll.NewProc("SDL_CreateTexture")
 	createTextureFromSurface          = dll.NewProc("SDL_CreateTextureFromSurface")
 	destroyRenderer                   = dll.NewProc("SDL_DestroyRenderer")
@@ -2233,7 +2247,9 @@ func LoadDLL(file string) error {
 	createSoftwareRenderer = dll.NewProc("SDL_CreateSoftwareRenderer")
 	renderClear = dll.NewProc("SDL_RenderClear")
 	renderCopy = dll.NewProc("SDL_RenderCopy")
+	renderCopyF = dll.NewProc("SDL_RenderCopyF")
 	renderCopyEx = dll.NewProc("SDL_RenderCopyEx")
+	renderCopyExF = dll.NewProc("SDL_RenderCopyExF")
 	createTexture = dll.NewProc("SDL_CreateTexture")
 	createTextureFromSurface = dll.NewProc("SDL_CreateTextureFromSurface")
 	destroyRenderer = dll.NewProc("SDL_DestroyRenderer")
@@ -5116,6 +5132,22 @@ func AddEventWatchFunc(filterFunc eventFilterFunc, userdata interface{}) EventWa
 	return AddEventWatch(filterFunc, userdata)
 }
 
+// FPoint defines a two dimensional point.
+// TODO: (https://wiki.libsdl.org/SDL_FPoint)
+type FPoint struct {
+	X float32 // the x coordinate of the point
+	Y float32 // the y coordinate of the point
+}
+
+// FRect contains the definition of a rectangle, with the origin at the upper left.
+// TODO: (https://wiki.libsdl.org/SDL_FRect)
+type FRect struct {
+	X float32 // the x location of the rectangle's upper left corner
+	Y float32 // the y location of the rectangle's upper left corner
+	W float32 // the width of the rectangle
+	H float32 // the height of the rectangle
+}
+
 // Finger contains touch information.
 type Finger struct {
 	ID       FingerID // the finger id
@@ -7106,6 +7138,18 @@ func (renderer *Renderer) Clear() error {
 // (https://wiki.libsdl.org/SDL_RenderCopy)
 func (renderer *Renderer) Copy(texture *Texture, src, dst *Rect) error {
 	ret, _, _ := renderCopy.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(unsafe.Pointer(texture)),
+		uintptr(unsafe.Pointer(src)),
+		uintptr(unsafe.Pointer(dst)),
+	)
+	return errorFromInt(int(ret))
+}
+
+// CopyF copies a portion of the texture to the current rendering target.
+// TODO: (https://wiki.libsdl.org/SDL_RenderCopyF)
+func (renderer *Renderer) CopyF(texture *Texture, src, dst *FRect) error {
+	ret, _, _ := renderCopyF.Call(
 		uintptr(unsafe.Pointer(renderer)),
 		uintptr(unsafe.Pointer(texture)),
 		uintptr(unsafe.Pointer(src)),
@@ -9230,9 +9274,9 @@ func (window *Window) UpdateSurfaceRects(rects []Rect) error {
 
 // VulkanCreateSurface creates a Vulkan rendering surface for a window.
 // (https://wiki.libsdl.org/SDL_Vulkan_CreateSurface)
-func (window *Window) VulkanCreateSurface(instance interface{}) (surface uintptr, err error) {
+func (window *Window) VulkanCreateSurface(instance interface{}) (surface unsafe.Pointer, err error) {
 	// TODO
-	return 0, nil
+	return nil, nil
 	//if instance == nil {
 	//	return 0, errors.New("vulkan: instance is nil")
 	//}

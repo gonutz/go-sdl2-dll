@@ -187,6 +187,25 @@ func (renderer *Renderer) CopyEx(texture *Texture, src, dst *Rect, angle float64
 	return errorFromInt(int(ret))
 }
 
+// CopyExF copies a portion of the texture to the current rendering target, optionally rotating it by angle around the given center and also flipping it top-bottom and/or left-right.
+// TODO: (https://wiki.libsdl.org/SDL_RenderCopyExF)
+func (renderer *Renderer) CopyExF(texture *Texture, src, dst *FRect, angle float64, center *FPoint, flip RendererFlip) error {
+	angleBits := math.Float64bits(angle)
+	a := uint32(angleBits)
+	b := uint32(angleBits >> 32)
+	ret, _, _ := renderCopyExF.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(unsafe.Pointer(texture)),
+		uintptr(unsafe.Pointer(src)),
+		uintptr(unsafe.Pointer(dst)),
+		uintptr(a),
+		uintptr(b),
+		uintptr(unsafe.Pointer(center)),
+		uintptr(flip),
+	)
+	return errorFromInt(int(ret))
+}
+
 // RecordGesture begins recording a gesture on a specified touch device or all touch devices.
 // (https://wiki.libsdl.org/SDL_RecordGesture)
 func RecordGesture(t TouchID) int {

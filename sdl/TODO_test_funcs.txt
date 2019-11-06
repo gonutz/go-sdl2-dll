@@ -64,7 +64,9 @@ ConvertAudio
 ConvertFormat (Surface)
 ConvertPixels
 Copy (Renderer)
+CopyF (Renderer)
 CopyEx (Renderer)
+CopyExF (Renderer)
 CreateColorCursor
 CreateCond
 CreateCursor
