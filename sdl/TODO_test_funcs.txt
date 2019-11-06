@@ -25,6 +25,7 @@ Ball (Joystick)
 BindForAxis (GameController)
 BindForButton (GameController)
 BitSize (AudioFormat)
+BitsPerPixel
 Blit (Surface)
 BlitScaled (Surface)
 Bounds (Surface)
@@ -41,6 +42,7 @@ ButtonMMask
 ButtonRMask
 ButtonX1Mask
 ButtonX2Mask
+BytesPerPixel
 BytesPerPixel (Surface)
 COMPILEDVERSION
 CalculateGammaRamp
@@ -85,6 +87,7 @@ CreateWindow
 CreateWindowAndRenderer
 CreateWindowFrom
 CurrentPowerLevel (Joystick)
+CurrentThreadID
 Data (Surface)
 	DelEventWatch
 	DelHintCallback
@@ -100,11 +103,17 @@ DestroyEffect (Haptic)
 DisableScreenSaver
 	Do
 DrawLine (Renderer)
+DrawLineF (Renderer)
 DrawLines (Renderer)
+DrawLinesF (Renderer)
 DrawPoint (Renderer)
+DrawPointF (Renderer)
 DrawPoints (Renderer)
+DrawPointsF (Renderer)
 DrawRect (Renderer)
+DrawRectF (Renderer)
 DrawRects (Renderer)
+DrawRectsF (Renderer)
 Duplicate (Surface)
 EffectSupported (Haptic)
 Empty (Rect)
@@ -114,12 +123,15 @@ Equals (Rect)
 Error
 EventState
 FillRect (Renderer)
+FillRectF (Renderer)
 FillRect (Surface)
 FillRects (Renderer)
+FillRectsF (Renderer)
 FillRects (Surface)
 FilterEvent (eventFilterFunc)
 FilterEvents
 FilterEventsFunc
+Flush (Renderer)
 Flush (AudioStream)
 FlushEvent
 FlushEvents
@@ -204,11 +216,13 @@ GetEventFilter
 GetEventState
 GetFlags (Window)
 GetGammaRamp (Window)
+GetGlobalMouseState
 GetGrab (Window)
 GetHint
 GetID (Window)
 GetInfo (Renderer)
 GetInstanceID (Sensor)
+GetIntegerScale (Renderer)
 GetKeyFromName
 GetKeyFromScancode
 GetKeyName
@@ -292,6 +306,7 @@ GetTimestamp (UserEvent)
 GetTimestamp (WindowEvent)
 GetTitle (Window)
 GetTouchDevice
+GetTouchDeviceType
 GetTouchFinger
 GetType (AudioDeviceEvent)
 GetType (ClipboardEvent)
@@ -539,6 +554,7 @@ SetGrab (Window)
 SetHint
 SetHintWithPriority
 SetIcon (Window)
+SetIntegerScale (Renderer)
 SetLogicalSize (Renderer)
 SetMaximumSize (Window)
 SetMinimumSize (Window)
@@ -563,6 +579,9 @@ ShowMessageBox
 ShowSimpleMessageBox
 Signal (Cond)
 	Size (RWops)
+SIMDAlloc
+SIMDFree
+SIMDGetAlignment
 SoftStretch (Surface)
 StartTextInput
 StopAll (Haptic)
