@@ -186,6 +186,13 @@ func GetTouchDevice(index int) TouchID {
 	return TouchID(ret)
 }
 
+// GetTouchDeviceType returns the type of the given touch device.
+// TODO: (https://wiki.libsdl.org/SDL_GetTouchDeviceType)
+func GetTouchDeviceType(id TouchID) TouchDeviceType {
+	ret, _, _ := getTouchDeviceType.Call(uintptr(id))
+	return TouchDeviceType(ret)
+}
+
 // SaveDollarTemplate saves a currently loaded Dollar Gesture template.
 // (https://wiki.libsdl.org/SDL_SaveDollarTemplate)
 func SaveDollarTemplate(g GestureID, src *RWops) int {

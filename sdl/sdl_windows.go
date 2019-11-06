@@ -1406,7 +1406,7 @@ const (
 	PIXELFORMAT_ABGR32 = PIXELFORMAT_RGBA8888
 )
 
-const SDL_STANDARD_GRAVITY = 9.80665
+const STANDARD_GRAVITY = 9.80665
 
 const TEXTINPUTEVENT_TEXT_SIZE = 32
 
@@ -1759,17 +1759,27 @@ var (
 	createTextureFromSurface          = dll.NewProc("SDL_CreateTextureFromSurface")
 	destroyRenderer                   = dll.NewProc("SDL_DestroyRenderer")
 	renderDrawLine                    = dll.NewProc("SDL_RenderDrawLine")
+	renderDrawLineF                   = dll.NewProc("SDL_RenderDrawLineF")
 	renderDrawLines                   = dll.NewProc("SDL_RenderDrawLines")
+	renderDrawLinesF                  = dll.NewProc("SDL_RenderDrawLinesF")
 	renderDrawPoint                   = dll.NewProc("SDL_RenderDrawPoint")
+	renderDrawPointF                  = dll.NewProc("SDL_RenderDrawPointF")
 	renderDrawPoints                  = dll.NewProc("SDL_RenderDrawPoints")
+	renderDrawPointsF                 = dll.NewProc("SDL_RenderDrawPointsF")
 	renderDrawRect                    = dll.NewProc("SDL_RenderDrawRect")
+	renderDrawRectF                   = dll.NewProc("SDL_RenderDrawRectF")
 	renderDrawRects                   = dll.NewProc("SDL_RenderDrawRects")
+	renderDrawRectsF                  = dll.NewProc("SDL_RenderDrawRectsF")
 	renderFillRect                    = dll.NewProc("SDL_RenderFillRect")
+	renderFillRectF                   = dll.NewProc("SDL_RenderFillRectF")
 	renderFillRects                   = dll.NewProc("SDL_RenderFillRects")
+	renderFillRectsF                  = dll.NewProc("SDL_RenderFillRectsF")
+	renderFlush                       = dll.NewProc("SDL_RenderFlush")
 	renderGetClipRect                 = dll.NewProc("SDL_RenderGetClipRect")
 	getRenderDrawBlendMode            = dll.NewProc("SDL_GetRenderDrawBlendMode")
 	getRenderDrawColor                = dll.NewProc("SDL_GetRenderDrawColor")
 	getRendererInfo                   = dll.NewProc("SDL_GetRendererInfo")
+	renderGetIntegerScale             = dll.NewProc("SDL_RenderGetIntegerScale")
 	renderGetLogicalSize              = dll.NewProc("SDL_RenderGetLogicalSize")
 	renderGetMetalCommandEncoder      = dll.NewProc("SDL_RenderGetMetalCommandEncoder")
 	renderGetMetalLayer               = dll.NewProc("SDL_RenderGetMetalLayer")
@@ -1783,6 +1793,7 @@ var (
 	renderSetClipRect                 = dll.NewProc("SDL_RenderSetClipRect")
 	setRenderDrawBlendMode            = dll.NewProc("SDL_SetRenderDrawBlendMode")
 	setRenderDrawColor                = dll.NewProc("SDL_SetRenderDrawColor")
+	renderSetIntegerScale             = dll.NewProc("SDL_RenderSetIntegerScale")
 	renderSetLogicalSize              = dll.NewProc("SDL_RenderSetLogicalSize")
 	setRenderTarget                   = dll.NewProc("SDL_SetRenderTarget")
 	renderSetScale                    = dll.NewProc("SDL_RenderSetScale")
@@ -1809,6 +1820,9 @@ var (
 	loadObject                        = dll.NewProc("SDL_LoadObject")
 	loadFunction                      = dll.NewProc("SDL_LoadFunction")
 	unloadObject                      = dll.NewProc("SDL_UnloadObject")
+	simdAlloc                         = dll.NewProc("SDL_SIMDAlloc")
+	simdFree                          = dll.NewProc("SDL_SIMDFree")
+	simdGetAlignment                  = dll.NewProc("SDL_SIMDGetAlignment")
 	createRGBSurface                  = dll.NewProc("SDL_CreateRGBSurface")
 	createRGBSurfaceFrom              = dll.NewProc("SDL_CreateRGBSurfaceFrom")
 	createRGBSurfaceWithFormat        = dll.NewProc("SDL_CreateRGBSurfaceWithFormat")
@@ -1856,6 +1870,7 @@ var (
 	updateTexture                     = dll.NewProc("SDL_UpdateTexture")
 	updateYUVTexture                  = dll.NewProc("SDL_UpdateYUVTexture")
 	getTouchDevice                    = dll.NewProc("SDL_GetTouchDevice")
+	getTouchDeviceType                = dll.NewProc("SDL_GetTouchDeviceType")
 	createWindow                      = dll.NewProc("SDL_CreateWindow")
 	createWindowFrom                  = dll.NewProc("SDL_CreateWindowFrom")
 	getKeyboardFocus                  = dll.NewProc("SDL_GetKeyboardFocus")
@@ -2254,17 +2269,27 @@ func LoadDLL(file string) error {
 	createTextureFromSurface = dll.NewProc("SDL_CreateTextureFromSurface")
 	destroyRenderer = dll.NewProc("SDL_DestroyRenderer")
 	renderDrawLine = dll.NewProc("SDL_RenderDrawLine")
+	renderDrawLineF = dll.NewProc("SDL_RenderDrawLineF")
 	renderDrawLines = dll.NewProc("SDL_RenderDrawLines")
+	renderDrawLinesF = dll.NewProc("SDL_RenderDrawLinesF")
 	renderDrawPoint = dll.NewProc("SDL_RenderDrawPoint")
+	renderDrawPointF = dll.NewProc("SDL_RenderDrawPointF")
 	renderDrawPoints = dll.NewProc("SDL_RenderDrawPoints")
+	renderDrawPointsF = dll.NewProc("SDL_RenderDrawPointsF")
 	renderDrawRect = dll.NewProc("SDL_RenderDrawRect")
+	renderDrawRectF = dll.NewProc("SDL_RenderDrawRectF")
 	renderDrawRects = dll.NewProc("SDL_RenderDrawRects")
+	renderDrawRectsF = dll.NewProc("SDL_RenderDrawRectsF")
 	renderFillRect = dll.NewProc("SDL_RenderFillRect")
+	renderFillRectF = dll.NewProc("SDL_RenderFillRectF")
 	renderFillRects = dll.NewProc("SDL_RenderFillRects")
+	renderFillRectsF = dll.NewProc("SDL_RenderFillRectsF")
+	renderFlush = dll.NewProc("SDL_RenderFlush")
 	renderGetClipRect = dll.NewProc("SDL_RenderGetClipRect")
 	getRenderDrawBlendMode = dll.NewProc("SDL_GetRenderDrawBlendMode")
 	getRenderDrawColor = dll.NewProc("SDL_GetRenderDrawColor")
 	getRendererInfo = dll.NewProc("SDL_GetRendererInfo")
+	renderGetIntegerScale = dll.NewProc("SDL_RenderGetIntegerScale")
 	renderGetLogicalSize = dll.NewProc("SDL_RenderGetLogicalSize")
 	renderGetMetalCommandEncoder = dll.NewProc("SDL_RenderGetMetalCommandEncoder")
 	renderGetMetalLayer = dll.NewProc("SDL_RenderGetMetalLayer")
@@ -2278,6 +2303,7 @@ func LoadDLL(file string) error {
 	renderSetClipRect = dll.NewProc("SDL_RenderSetClipRect")
 	setRenderDrawBlendMode = dll.NewProc("SDL_SetRenderDrawBlendMode")
 	setRenderDrawColor = dll.NewProc("SDL_SetRenderDrawColor")
+	renderSetIntegerScale = dll.NewProc("SDL_RenderSetIntegerScale")
 	renderSetLogicalSize = dll.NewProc("SDL_RenderSetLogicalSize")
 	setRenderTarget = dll.NewProc("SDL_SetRenderTarget")
 	renderSetScale = dll.NewProc("SDL_RenderSetScale")
@@ -2304,6 +2330,9 @@ func LoadDLL(file string) error {
 	loadObject = dll.NewProc("SDL_LoadObject")
 	loadFunction = dll.NewProc("SDL_LoadFunction")
 	unloadObject = dll.NewProc("SDL_UnloadObject")
+	simdAlloc = dll.NewProc("SDL_SIMDAlloc")
+	simdFree = dll.NewProc("SDL_SIMDFree")
+	simdGetAlignment = dll.NewProc("SDL_SIMDGetAlignment")
 	createRGBSurface = dll.NewProc("SDL_CreateRGBSurface")
 	createRGBSurfaceFrom = dll.NewProc("SDL_CreateRGBSurfaceFrom")
 	createRGBSurfaceWithFormat = dll.NewProc("SDL_CreateRGBSurfaceWithFormat")
@@ -2351,6 +2380,7 @@ func LoadDLL(file string) error {
 	updateTexture = dll.NewProc("SDL_UpdateTexture")
 	updateYUVTexture = dll.NewProc("SDL_UpdateYUVTexture")
 	getTouchDevice = dll.NewProc("SDL_GetTouchDevice")
+	getTouchDeviceType = dll.NewProc("SDL_GetTouchDeviceType")
 	createWindow = dll.NewProc("SDL_CreateWindow")
 	createWindowFrom = dll.NewProc("SDL_CreateWindowFrom")
 	getKeyboardFocus = dll.NewProc("SDL_GetKeyboardFocus")
@@ -4169,6 +4199,25 @@ func StartTextInput() {
 // (https://wiki.libsdl.org/SDL_StopTextInput)
 func StopTextInput() {
 	stopTextInput.Call()
+}
+
+type SysWMmsg struct {
+	Version   Version  // a Version structure that contains the current SDL version
+	Subsystem uint32   // the windowing system type
+	data      [24]byte // internal data
+}
+
+// Windows() returns Microsoft Windows message.
+func (msg *SysWMmsg) Windows() *WindowsMsg {
+	return (*WindowsMsg)(unsafe.Pointer(&msg.data[0]))
+}
+
+// WindowsMsg contains Microsoft Windows window information.
+type WindowsMsg struct {
+	Hwnd   uintptr
+	Msg    uint
+	WParam uintptr
+	LParam uintptr
 }
 
 // UnlockAudio unlocks the audio device. New programs might want to use UnlockAudioDevice() instead.
@@ -6546,8 +6595,11 @@ func (rwops *RWops) Read(buf []byte) (n int, err error) {
 // Read2 reads from a data source (native).
 // (https://wiki.libsdl.org/SDL_RWread)
 func (rwops *RWops) Read2(buf []byte, size, maxnum uint) (n int, err error) {
-	if rwops == nil || buf == nil {
+	if rwops == nil {
 		return 0, ErrInvalidParameters
+	}
+	if len(buf) == 0 {
+		return 0, nil
 	}
 	ret, _, _ := syscall.Syscall6(
 		rwops.read,
@@ -6631,8 +6683,11 @@ func (rwops *RWops) Write(buf []byte) (n int, err error) {
 // Write2 writes to the RWops data stream (native).
 // (https://wiki.libsdl.org/SDL_RWwrite)
 func (rwops *RWops) Write2(buf []byte, size, num uint) (n int, err error) {
-	if rwops == nil || buf == nil {
+	if rwops == nil {
 		return 0, ErrInvalidParameters
+	}
+	if len(buf) == 0 {
+		return 0, nil
 	}
 	ret, _, _ := syscall.Syscall6(
 		rwops.write,
@@ -7211,17 +7266,43 @@ func (renderer *Renderer) DrawLine(x1, y1, x2, y2 int32) error {
 		uintptr(x2),
 		uintptr(y2),
 	)
+	return errorFromInt(int(ret))
+}
 
+// DrawLineF draws a line on the current rendering target.
+// TODO: (https://wiki.libsdl.org/SDL_RenderDrawLineF)
+func (renderer *Renderer) DrawLineF(x1, y1, x2, y2 float32) error {
+	ret, _, _ := renderDrawLineF.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(x1),
+		uintptr(y1),
+		uintptr(x2),
+		uintptr(y2),
+	)
 	return errorFromInt(int(ret))
 }
 
 // DrawLines draws a series of connected lines on the current rendering target.
 // (https://wiki.libsdl.org/SDL_RenderDrawLines)
 func (renderer *Renderer) DrawLines(points []Point) error {
-	if points == nil {
+	if len(points) == 0 {
 		return nil
 	}
 	ret, _, _ := renderDrawLines.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(unsafe.Pointer(&points[0])),
+		uintptr(len(points)),
+	)
+	return errorFromInt(int(ret))
+}
+
+// DrawLinesF draws a series of connected lines on the current rendering target.
+// TODO: (https://wiki.libsdl.org/SDL_RenderDrawLinesF)
+func (renderer *Renderer) DrawLinesF(points []FPoint) error {
+	if len(points) == 0 {
+		return nil
+	}
+	ret, _, _ := renderDrawLinesF.Call(
 		uintptr(unsafe.Pointer(renderer)),
 		uintptr(unsafe.Pointer(&points[0])),
 		uintptr(len(points)),
@@ -7240,13 +7321,38 @@ func (renderer *Renderer) DrawPoint(x, y int32) error {
 	return errorFromInt(int(ret))
 }
 
+// DrawPointF draws a point on the current rendering target.
+// TODO: (https://wiki.libsdl.org/SDL_RenderDrawPointF)
+func (renderer *Renderer) DrawPointF(x, y float32) error {
+	ret, _, _ := renderDrawPointF.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(x),
+		uintptr(y),
+	)
+	return errorFromInt(int(ret))
+}
+
 // DrawPoints draws multiple points on the current rendering target.
 // (https://wiki.libsdl.org/SDL_RenderDrawPoints)
 func (renderer *Renderer) DrawPoints(points []Point) error {
-	if points == nil {
+	if len(points) == 0 {
 		return nil
 	}
 	ret, _, _ := renderDrawPoints.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(unsafe.Pointer(&points[0])),
+		uintptr(len(points)),
+	)
+	return errorFromInt(int(ret))
+}
+
+// DrawPointsF draws multiple points on the current rendering target.
+// TODO: (https://wiki.libsdl.org/SDL_RenderDrawPointsF)
+func (renderer *Renderer) DrawPointsF(points []FPoint) error {
+	if len(points) == 0 {
+		return nil
+	}
+	ret, _, _ := renderDrawPointsF.Call(
 		uintptr(unsafe.Pointer(renderer)),
 		uintptr(unsafe.Pointer(&points[0])),
 		uintptr(len(points)),
@@ -7264,13 +7370,37 @@ func (renderer *Renderer) DrawRect(rect *Rect) error {
 	return errorFromInt(int(ret))
 }
 
+// DrawRectF draws a rectangle on the current rendering target.
+// TODO: (https://wiki.libsdl.org/SDL_RenderDrawRectF)
+func (renderer *Renderer) DrawRectF(rect *FRect) error {
+	ret, _, _ := renderDrawRectF.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(unsafe.Pointer(rect)),
+	)
+	return errorFromInt(int(ret))
+}
+
 // DrawRects draws some number of rectangles on the current rendering target.
 // (https://wiki.libsdl.org/SDL_RenderDrawRects)
 func (renderer *Renderer) DrawRects(rects []Rect) error {
-	if rects == nil {
+	if len(rects) == 0 {
 		return nil
 	}
 	ret, _, _ := renderDrawRects.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(unsafe.Pointer(&rects[0])),
+		uintptr(len(rects)),
+	)
+	return errorFromInt(int(ret))
+}
+
+// DrawRectsF draws some number of rectangles on the current rendering target.
+// TODO: (https://wiki.libsdl.org/SDL_RenderDrawRectsF)
+func (renderer *Renderer) DrawRectsF(rects []FRect) error {
+	if len(rects) == 0 {
+		return nil
+	}
+	ret, _, _ := renderDrawRectsF.Call(
 		uintptr(unsafe.Pointer(renderer)),
 		uintptr(unsafe.Pointer(&rects[0])),
 		uintptr(len(rects)),
@@ -7288,10 +7418,20 @@ func (renderer *Renderer) FillRect(rect *Rect) error {
 	return errorFromInt(int(ret))
 }
 
+// FillRectF fills a rectangle on the current rendering target with the drawing color.
+// TODO: (https://wiki.libsdl.org/SDL_RenderFillRectF)
+func (renderer *Renderer) FillRectF(rect *FRect) error {
+	ret, _, _ := renderFillRectF.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(unsafe.Pointer(rect)),
+	)
+	return errorFromInt(int(ret))
+}
+
 // FillRects fills some number of rectangles on the current rendering target with the drawing color.
 // (https://wiki.libsdl.org/SDL_RenderFillRects)
 func (renderer *Renderer) FillRects(rects []Rect) error {
-	if rects == nil {
+	if len(rects) == 0 {
 		return nil
 	}
 	ret, _, _ := renderFillRects.Call(
@@ -7299,6 +7439,27 @@ func (renderer *Renderer) FillRects(rects []Rect) error {
 		uintptr(unsafe.Pointer(&rects[0])),
 		uintptr(len(rects)),
 	)
+	return errorFromInt(int(ret))
+}
+
+// FillRectsF fills some number of rectangles on the current rendering target with the drawing color.
+// TODO: (https://wiki.libsdl.org/SDL_RenderFillRectsF)
+func (renderer *Renderer) FillRectsF(rects []FRect) error {
+	if len(rects) == 0 {
+		return nil
+	}
+	ret, _, _ := renderFillRectsF.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(unsafe.Pointer(&rects[0])),
+		uintptr(len(rects)),
+	)
+	return errorFromInt(int(ret))
+}
+
+// Flush forces the rendering context to flush any pending commands to the underlying rendering API.
+// TODO: (https://wiki.libsdl.org/SDL_RenderFlush)
+func (renderer *Renderer) Flush() error {
+	ret, _, _ := renderFlush.Call(uintptr(unsafe.Pointer(renderer)))
 	return errorFromInt(int(ret))
 }
 
@@ -7338,15 +7499,26 @@ func (renderer *Renderer) GetDrawColor() (r, g, b, a uint8, err error) {
 
 // GetInfo returns information about a rendering context.
 // (https://wiki.libsdl.org/SDL_GetRendererInfo)
-func (renderer *Renderer) GetInfo() (r RendererInfo, err error) {
+func (renderer *Renderer) GetInfo() (RendererInfo, error) {
+	var info RendererInfo
 	ret, _, _ := getRendererInfo.Call(
 		uintptr(unsafe.Pointer(renderer)),
-		uintptr(unsafe.Pointer(&r)),
+		uintptr(unsafe.Pointer(&info)),
 	)
 	if ret != 0 {
-		err = GetError()
+		return info, GetError()
 	}
-	return
+	return info, nil
+}
+
+// GetIntegerScale reports whether integer scales are forced for
+// resolution-independent rendering.
+//
+// (https://wiki.libsdl.org/SDL_RenderGetIntegerScale)
+func (renderer *Renderer) GetIntegerScale() (bool, error) {
+	ClearError()
+	ret, _, _ := renderGetIntegerScale.Call(uintptr(unsafe.Pointer(renderer)))
+	return ret != 0, GetError()
 }
 
 // GetLogicalSize returns device independent resolution for rendering.
@@ -7487,6 +7659,22 @@ func (renderer *Renderer) SetDrawColorArray(bs ...uint8) error {
 	c := [4]uint8{0, 0, 0, 255}
 	copy(c[:], bs)
 	return renderer.SetDrawColor(c[0], c[1], c[2], c[3])
+}
+
+// SetIntegerScale sets whether to force integer scales for
+// resolution-independent rendering.
+//
+// This function restricts the logical viewport to integer values - that is,
+// when a resolution is between two multiples of a logical size, the viewport
+// size is rounded down to the lower multiple.
+//
+// (https://wiki.libsdl.org/SDL_RenderSetIntegerScale)
+func (renderer *Renderer) SetIntegerScale(v bool) error {
+	ret, _, _ := renderSetIntegerScale.Call(
+		uintptr(unsafe.Pointer(renderer)),
+		uintptr(Btoi(v)),
+	)
+	return errorFromInt(int(ret))
 }
 
 // SetLogicalSize sets a device independent resolution for rendering.
@@ -7676,7 +7864,7 @@ func (sensor *Sensor) Close() {
 // The number of values and interpretation of the data is sensor dependent.
 // (https://wiki.libsdl.org/SDL_SensorGetData)
 func (sensor *Sensor) GetData(data []float32) (err error) {
-	if data == nil {
+	if len(data) == 0 {
 		return nil
 	}
 	ret, _, _ := sensorGetData.Call(
@@ -7816,6 +8004,26 @@ func (handle SharedObject) LoadFunction(name string) unsafe.Pointer {
 // (https://wiki.libsdl.org/SDL_UnloadObject)
 func (handle SharedObject) Unload() {
 	unloadObject.Call(uintptr(handle))
+}
+
+// SIMDAlloc allocates memory in a SIMD-friendly way.
+// TODO: (https://wiki.libsdl.org/SDL_SIMDAlloc)
+func SIMDAlloc(length int) unsafe.Pointer {
+	ret, _, _ := simdAlloc.Call(uintptr(length))
+	return unsafe.Pointer(ret)
+}
+
+// SIMDFree deallocates memory obtained from SDL_SIMDAlloc.
+// TODO: (https://wiki.libsdl.org/SDL_SIMDFree)
+func SIMDFree(p unsafe.Pointer) {
+	simdFree.Call(uintptr(p))
+}
+
+// SIMDGetAlignment reports the alignment this system needs for SIMD allocations.
+// TODO: (https://wiki.libsdl.org/SDL_SIMDGetAlignment)
+func SIMDGetAlignment() int {
+	ret, _, _ := simdGetAlignment.Call()
+	return int(ret)
 }
 
 // Surface contains a collection of pixels used in software blitting.
@@ -8056,7 +8264,7 @@ func (surface *Surface) FillRect(rect *Rect, color uint32) error {
 // FillRects performs a fast fill of a set of rectangles with a specific color.
 // (https://wiki.libsdl.org/SDL_FillRects)
 func (surface *Surface) FillRects(rects []Rect, color uint32) error {
-	if rects == nil {
+	if len(rects) == 0 {
 		return nil
 	}
 	ret, _, _ := fillRects.Call(
@@ -8663,7 +8871,7 @@ func (texture *Texture) Unlock() {
 // Update updates the given texture rectangle with new pixel data.
 // (https://wiki.libsdl.org/SDL_UpdateTexture)
 func (texture *Texture) Update(rect *Rect, pixels []byte, pitch int) error {
-	if pixels == nil {
+	if len(pixels) == 0 {
 		return nil
 	}
 	ret, _, _ := updateTexture.Call(
@@ -8678,7 +8886,7 @@ func (texture *Texture) Update(rect *Rect, pixels []byte, pitch int) error {
 // UpdateRGBA updates the given texture rectangle with new uint32 pixel data.
 // (https://wiki.libsdl.org/SDL_UpdateTexture)
 func (texture *Texture) UpdateRGBA(rect *Rect, pixels []uint32, pitch int) error {
-	if pixels == nil {
+	if len(pixels) == 0 {
 		return nil
 	}
 	ret, _, _ := updateTexture.Call(
@@ -8718,6 +8926,16 @@ func (texture *Texture) UpdateYUV(rect *Rect, yPlane []byte, yPitch int, uPlane 
 
 // ThreadID is the thread identifier for a thread.
 type ThreadID uint64
+
+// TouchDeviceType is a touch device type.
+type TouchDeviceType int
+
+const (
+	TOUCH_DEVICE_INVALID           TouchDeviceType = -1
+	TOUCH_DEVICE_DIRECT                            = 0 // touch screen with window-relative coordinates
+	TOUCH_DEVICE_INDIRECT_ABSOLUTE                 = 1 // trackpad with absolute device coordinates
+	TOUCH_DEVICE_INDIRECT_RELATIVE                 = 2 // trackpad with screen cursor-relative coordinates
+)
 
 // TouchFingerEvent contains finger touch event information.
 // (https://wiki.libsdl.org/SDL_TouchFingerEvent)
@@ -9261,7 +9479,7 @@ func (window *Window) UpdateSurface() error {
 // UpdateSurfaceRects copies areas of the window surface to the screen.
 // (https://wiki.libsdl.org/SDL_UpdateWindowSurfaceRects)
 func (window *Window) UpdateSurfaceRects(rects []Rect) error {
-	if rects == nil {
+	if len(rects) == 0 {
 		return nil
 	}
 	ret, _, _ := updateWindowSurfaceRects.Call(
