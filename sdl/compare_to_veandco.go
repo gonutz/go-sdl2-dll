@@ -52,7 +52,13 @@ func parse(owner string) []string {
 	path := filepath.Join(os.Getenv("GOPATH"), "src", "github.com", owner, "go-sdl2", "sdl")
 	pkgs, err := parser.ParseDir(&fs, path, func(f os.FileInfo) bool {
 		name := strings.ToLower(f.Name())
-		return !strings.HasSuffix(name, "_test.go")
+		return !strings.HasSuffix(name, "_test.go") &&
+			!strings.HasSuffix(name, "_android.go") &&
+			!strings.HasSuffix(name, "_cocoa.go") && // for mac OS' Cocoa framework
+			!strings.HasSuffix(name, "_x11.go") && // for Linux' X11 windowing system
+			!strings.HasSuffix(name, "_dfb.go") && // for Direct Frame Buffer on Linux
+			!strings.HasSuffix(name, "_vivante.go") && // for smart phones
+			!strings.HasSuffix(name, "_uikit.go") // for mac OS
 	}, parser.AllErrors)
 	if err != nil {
 		panic(err)
